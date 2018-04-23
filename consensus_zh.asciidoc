@@ -49,14 +49,14 @@ POA目前由测试网络Kovan（POA网络）使用，并且可以在Parity中为
 
 === Ethash简介
 
-Ethash是以太坊的 *作证明(PoW)算法* ，它依赖于初始时期生成的大小约为1GB的数据集的，称为有向无环图 (*DAG*) 。 *DAG* 使用了 *Dagger-Hashimoto算法* 的一个版本，它是 *Vitalik Buterin's Dagger算法* 和 *Thaddeus Dryja's Hashimoto算法* 的组合。 *Dagger-Hashimoto算法* 是Ethereum 1.0使用的挖矿算法。随着时间的推移， *DAG* 线性增长，并且每个 *纪元*（30,000块，125小时）更新一次。
+Ethash是以太坊的 *工作证明(PoW)算法* ，它依赖于初始时期生成的大小约为1GB的数据集的，称为有向无环图 (*DAG*) 。 *DAG* 使用了 *Dagger-Hashimoto算法* 的一个版本，它是 *Vitalik Buterin's Dagger算法* 和 *Thaddeus Dryja's Hashimoto算法* 的组合。 *Dagger-Hashimoto算法* 是Ethereum 1.0使用的挖矿算法。随着时间的推移， *DAG* 线性增长，并且每个 *纪元*（30,000块，125小时）更新一次。
 
 ==== 种子、缓存、数据生成
 
 *PoW算法* 包括: +
  -  通过扫描 *DAG* 的前面的区块头为每个区块计算 *种子* 。 +
  -  *Cache* 是一个16MB的伪随机缓存，根据种子计算出来，存储在轻量客户端中。 +
- -  *DAG*的 *数据生成* 来自缓存，用于存储在完整客户端和矿工上（数据集中的每个项目仅依赖于缓存中的少量项目）。+
+ -  *DAG*的 *数据生成* 来自缓存，用于存储在完整客户端和矿工上（数据集中的每个项目仅依赖于缓存中的少量项目）。 +
  -  *矿工* 通过对数据集进行随机切片并将它们散列在一起进行挖矿。可以使用存储的高速缓存和低内存来执行验证，以重新生成所需数据集的特定部分。
 
 .References：
