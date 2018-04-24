@@ -1,0 +1,531 @@
+[[evm_chapter]]
+== 以太坊虚拟机
+
+[[evm_description]]
+=== 它是什么？
+实际处理内部状态和计算的协议部分称为以太坊虚拟机（EVM）。从实际的角度来看，EVM可以被认为是一个包含数百万个对象的大型去中心计算机。
+
+[[evm_comparison]]
+==== 比较
+
+* 虚拟机（Virtualbox、QEMU、云计算）
+
+* Java VM
+
+诸如Virtualbox和QEMU/KVM之类的虚拟机技术与EVM的不同之处在于，它们的目的是提供虚拟层功能，或者处理客户操作系统与底层主机操作系统和硬件之间的系统调用、任务调度和资源管理的软件抽象。
+
+但是，Java VM（JVM）规范的某些方面确实包含与EVM的相似之处。从高层概述来看，JVM旨在提供一个运行时环境，而不考虑底层主机操作系统或硬件，从而实现跨多种系统的兼容性。在JVM上运行的高级程序语言（如Java或Scala）被编译到相应的指令集字节码中。这与编译Solidity源文件以在EVM上运行相当。
+
+[[evm_bytecode_overview]]
+==== EVM机器语言（字节码操作）
+
+EVM机器语言分为特定的指令集组，如算术运算、逻辑和比较运算、控制流程、系统调用、堆栈运算和存储器运算。除了典型的字节码操作之外，EVM还必须管理账户信息（即地址和余额），当前燃料价格和区块信息。
+[[common_stack_opcodes]]
+通用堆栈操作:: 用于堆栈和内存管理的操作码指令: 
+
+----
+POP   	    //弹出堆栈中的项目
+PUSH	//推送项目进堆栈
+MLOAD     //将项目加载到内存中
+MSTORE   //将项目存储在内存中
+JUMP        //改变程序计数器（PC）的位置
+PC             //程序计数器
+MSIZE      //活动内存大小
+GAS         //交易的可用燃料数
+DUP        //堆栈中的项目制作副本
+SWAP //堆栈项目交换操作
+----
+
+[[common_system_opcodes]]
+通用系统操作:: 执行程序的系统的操作码指令: 
+
+----
+CREATE  //创建一个新帐户
+CALL //消息在帐户之间传递的指令
+RETURN //执行暂停
+REVERT //执行暂停，恢复状态更改
+SELFDESTRUCT //执行暂停，并标记帐户以进行删除
+----
+
+[[common_arithmetic_opcodes]]
+算术运算:: 通用算术运算码指令: 
+
+----
+ADD  //添加
+MUL //乘法
+SUB //减法
+DIV //整数除法
+SDIV //有符号整数除法
+MOD //模（余数）操作
+SMOD //签名模操作
+ADDMOD //模数加法
+MULMOD //模数乘法
+EXP //指数操作
+STOP //停止操作
+----
+
+[[common_environment_opcodes]]
+环境操作码:: 处理执行环境信息的通用操作码: 
+
+----
+ADDRESS //当前执行账户的地址
+BALANCE //帐户余额
+CALLVALUE //执行环境的交易值
+ORIGIN //执行环境的起始地址
+CALLER //执行调用者的地址
+CODESIZE //执行环境代码大小
+GASPRICE //燃料价格规定
+EXTCODESIZE //帐户的代码大小
+RETURNDATACOPY //从前一次内存调用输出的数据副本
+----
+
+[[evm_state_descriptions]]
+==== 状态
+
+与任何计算机系统一样，状态的概念是一个重要的概念。就像CPU跟踪执行过程一样，EVM必须跟踪各个组件的状态以支持交易。这些组件的状态 (_state_) 最终将推动总体区块链的变化。由此可以将以太坊描述为一个  _基于交易的状态机_ ，其包含以下组件: 
+
+World State:: 160位地址标识符与帐户状态之间的映射，由一个不可变的 _Merkle Patricia Tree_ 数据结构维护。
+
+账户状态:: 包含以下四个组件:
+
+* _nonce_: 代表从此帐户发送的交易数量的值。
+
+* _balance_: 帐户地址所拥有的 _wei_ 的数量。
+
+* _storageRoot_: Merkle Patricia树的根节点的256位散列。
+
+* _codeHash_: 各个帐户的EVM代码的不可变哈希值。
+
+存储状态:: 在EVM上运行时维护的帐户特定状态信息。
+
+区块信息:: 交易所需的状态值，其包括以下内容: 
+
+* _blockhash_: 最近完成的区块的散列。
+
+* _coinbase_: 接收人的地址。
+
+* _timestamp_: 当前区块的时间戳。
+
+* _number_: 当前区块的编号。
+
+* _difficulty_: 当前区块的难度。
+
+* _gaslimit_: 当前区块的燃料限制。
+
+运行时环境信息:: 用于帮助交易的信息。
+
+* _gasprice_: 当前燃料价格，由交易发起人指定。
+
+* _codesize_: 交易代码库的大小。
+
+* _caller_: 执行当前交易的账户的地址。
+
+* _origin_: 当前交易原始发送人的地址。
+
+
+
+状态转换通过以下函数进行计算: 
+
+以太坊状态转换函数:: 用于计算 _有效状态转换_ 。
+
+区块完成状态转换函数:: 作为挖矿过程的一部分用于确定最终区块的状态，包括区块奖励。
+
+区块级别状态转换函数:: 应用于交易状态时区块结束状态转换函数的结果状态。
+
+[[compiling_solidity_to_evm]]
+==== 将Solidity编译为EVM字节码
+
+[[solc_help]]
+编译一个Solidity源文件到EVM字节码可以通过命令行完成。有关其他编译选项的列表，只需运行以下命令: 
+
+----
+$ solc --help
+----
+
+[[solc_opcodes_option]]
+使用 _--opcodes_ 命令行选项可以轻松实现生成Solidity源文件的原始操作码流。这个操作码流留下了一些信息（ _--asm_ 选项产生完整的信息），但对于第一次引入来说就足够了。例如，编译示例Solidity文件 _Example.sol_ 并将操作码输出填充到名为 _BytecodeDir_ 的目录中，可使用以下命令完成: 
+
+----
+$ solc -o BytecodeOutputDir --opcodes Example.sol
+----
+
+或者
+
+[[solc_asm_option]]
+----
+$ solc -o BytecodeOutputDir --asm Example.sol
+----
+
+[[solc_bin_option]]
+以下命令将为我们的示例程序生成二进制字节码: 
+
+----
+$ solc -o BytecodeOutputDir --bin Example.sol
+----
+
+生成的输出操作码文件将取决于Solidity源文件中包含的特定合约。我们简单的Solidity文件 _Example.sol_  <<simple_solidity_example>> 只有一个名为“example”的合约。
+
+[[simple_solidity_example]]
+----
+pragma solidity ^0.4.19;
+
+contract example {
+
+  address contractOwner;
+
+  function example() {
+    contractOwner = msg.sender;
+  }
+}
+----
+
+
+如果您查看 _BytecodeDir_ 目录，您将看到操作码文件 _example.opcode_ （请参阅 <<simple_solidity_example>> ），其中包含“example”合约的EVM机器语言操作码指令。在文本编辑器中打开 _example.opcode_ 文件将显示以下内容: 
+
+[[opcode_output]]
+----
+PUSH1 0x60 PUSH1 0x40 MSTORE CALLVALUE ISZERO PUSH1 0xE JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST CALLER PUSH1 0x0 DUP1 PUSH2 0x100 EXP DUP2 SLOAD DUP2 PUSH20 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF MUL NOT AND SWAP1 DUP4 PUSH20 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF AND MUL OR SWAP1 SSTORE POP PUSH1 0x35 DUP1 PUSH1 0x5B PUSH1 0x0 CODECOPY PUSH1 0x0 RETURN STOP PUSH1 0x60 PUSH1 0x40 MSTORE PUSH1 0x0 DUP1 REVERT STOP LOG1 PUSH6 0x627A7A723058 KECCAK256 JUMP 0xb9 SWAP14 0xcb 0x1e 0xdd RETURNDATACOPY 0xec 0xe0 0x1f 0x27 0xc9 PUSH5 0x9C5ABCC14A NUMBER 0x5e INVALID EXTCODESIZE 0xdb 0xcf EXTCODESIZE 0x27 EXTCODESIZE 0xe2 0xb8 SWAP10 0xed 0x
+----
+
+使用 _--asm_ 选项编译示例会在 _BytecodeDir_ 目录中生成一个文件实例 _example.evm_ 。这包含详细的EVM机器语言指令: 
+
+[[asm_output]]
+----
+/* "Example.sol":26:132  contract example {... */
+  mstore(0x40, 0x60)
+    /* "Example.sol":74:130  function example() {... */
+  jumpi(tag_1, iszero(callvalue))
+  0x0
+  dup1
+  revert
+tag_1:
+    /* "Example.sol":115:125  msg.sender */
+  caller
+    /* "Example.sol":99:112  contractOwner */
+  0x0
+  dup1
+    /* "Example.sol":99:125  contractOwner = msg.sender */
+  0x100
+  exp
+  dup2
+  sload
+  dup2
+  0xffffffffffffffffffffffffffffffffffffffff
+  mul
+  not
+  and
+  swap1
+  dup4
+  0xffffffffffffffffffffffffffffffffffffffff
+  and
+  mul
+  or
+  swap1
+  sstore
+  pop
+    /* "Example.sol":26:132  contract example {... */
+  dataSize(sub_0)
+  dup1
+  dataOffset(sub_0)
+  0x0
+  codecopy
+  0x0
+  return
+stop
+
+sub_0: assembly {
+        /* "Example.sol":26:132  contract example {... */
+      mstore(0x40, 0x60)
+      0x0
+      dup1
+      revert
+
+    auxdata: 0xa165627a7a7230582056b99dcb1edd3eece01f27c9649c5abcc14a435efe3bdbcf3b273be2b899eda90029
+}
+----
+
+_--bin_ 选项产生以下内容: 
+
+[[bin_output]]
+----
+60606040523415600e57600080fd5b336000806101000a81548173
+ffffffffffffffffffffffffffffffffffffffff
+021916908373
+ffffffffffffffffffffffffffffffffffffffff
+160217905550603580605b6000396000f3006060604052600080fd00a165627a7a7230582056b99dcb1e
+----
+
+让我们来看看前两条指令（参考 <<common_stack_opcodes>> ）: 
+
+[[opcode_analysis_1]]
+----
+PUSH1 0x60 PUSH1 0x40
+----
+
+在这里，我们有 _mnemonic_ “PUSH1”后跟一个值为“0x60”的原始字节。这对应于将操作码之后的单个字节解释为文字值并将其推入堆栈的EVM指令。可以将最多32个字节的值压入堆栈。例如，以下字节码将一个4字节的值压入堆栈: 
+
+[[opcode_analysis_2]]
+----
+PUSH4 0x7f1baa12
+----
+
+第二个推式操作码在堆栈上存储“0x40”（在那里已经存在“0x60”的顶部）。
+
+继续下面两条指令: 
+
+[[opcode_analysis_3]]
+----
+MSTORE CALLVALUE
+----
+
+MSTORE是一个堆栈/内存操作（参见 <<common_stack_opcodes>> ），它将值保存到内存中，而CALLVALUE是一个环境操作码（参见 <<common_environment_opcodes>> ），它返回正在执行的消息调用的存入值。
+
+[[evm_bytecode_execution]]
+==== 执行EVM字节码
+
+[[gas_accounting_execution]]
+==== 燃料、账单
+
+对于每笔交易，都有一个相关的 _gas-limit_ 和 _gas-price_ ，它们构成了EVM执行的费用。这些费用用于促进交易的必要资源，例如计算和内存。燃料也用于创建账户和智能合约。
+
+[[turing_completeness_and_gas]]
+==== 图灵完备和燃料
+
+简而言之，如果系统或编程语言可以解决您输入的任何问题，则该系统或编程语言就是 _图灵完备_的。这在以太坊黄皮书中讨论过: 
+
+[引用，Gavin Wood，以太坊: 一个安全的去中心广义交易账本]
+____________________________________________________________________
+这是一个 _准_ 完备图灵机; 准资格来源于这样一个事实，即计算本质上通过一个参数（燃料）来限制，这个参数限制了完成的总计算量。
+____________________________________________________________________
+
+虽然EVM理论上可以解决它接收到的任何问题，但是燃料可能会阻止它这样做。这可能以几种方式发生: 
+
+1）在以太坊开采的区块有燃料限制，即该区块内所有交易所使用的总用气量不得超过一定限度。
+2）由于燃料和燃料价格齐头并进，即使解除了燃料限制，高度复杂的交易在经济上也许是不可行的。
+
+但是，对于大多数用例，EVM可以解决提供给它的任何问题。
+
+[[bytecode_vs_runtime_bytecode]]
+==== 字节码与运行时字节码
+
+编译合约时，您可以获取 _合约字节码_ 或 _运行时字节码_ 。
+
+合约字节码包含了实际最终位于区块链上的字节码 _加上_ 将字节码放在区块链上并运行合约的构造函数所需的字节码。
+
+另一方面，运行时字节码只是最终位于blockchain_上的字节码。这不包括初始化合约并将其放置在区块链上所需的字节码。
+
+让我们以前面创建的简单`Faucet.sol`合约为例。
+
+[[faucet_example]]
+----
+// Version of Solidity compiler this program was written for
+pragma solidity ^0.4.19;
+
+// Our first contract is a faucet!
+contract Faucet {
+
+  // Give out ether to anyone who asks
+  function withdraw(uint withdraw_amount) public {
+
+      // Limit withdrawal amount
+      require(withdraw_amount <= 100000000000000000);
+
+      // Send the amount to the address that requested it
+      msg.sender.transfer(withdraw_amount);
+    }
+
+  // Accept any incoming amount
+  function () public payable {}
+
+}
+----
+
+为了得到合约字节码，我们将运行`solc --bin Faucet.sol`。如果我们只需要运行时字节码，我们就可以运行`solc --bin-runtime Faucet.sol`。
+
+如果您比较这些命令的输出，您会看到运行时字节码是合约字节码的一个子集。换句话说，运行时字节码完全包含在合约字节码中。
+
+[[disassembling_the_bytecode]]
+==== 反汇编字节码
+
+分解EVM字节码是了解EVM中高级别Solidity行为的好方法。有几个反汇编程序可以用来执行此操作: 
+
+ - *Porosity* 是一个流行的开源反编译器: https://github.com/comaeio/porosity
+ - *Ethersplay* 是Binary Ninja的EVM插件，反汇编: https://github.com/trailofbits/ethersplay
+ - *IDA-Evm * 是IDA的EVM插件，另一个反汇编: https://github.com/trailofbits/ida-evm
+
+在本节中，我们将为Binary Ninja使用 *Ethersplay* 插件。
+
+获得Faucet.sol的运行时字节码后，我们可以将其馈入Binary Ninja（在导入Ethersplay插件后）以查看EVM指令的外观。
+
+[[Faucet_disassembled]]
+.分解水龙头运行时字节码
+image::images/Faucet_disassembled.png["Faucet.sol runtime bytecode disassembled"]
+
+当您将交易发送至智能合约时，交易首先与该智能合约的**dispatcher**交互。调度程序读取交易的数据字段并将其发送到适当的函数。
+
+在我们熟悉的MSTORE指令之后，我们在编译的Faucet.sol合约中看到以下例子: 
+
+[[faucet_instructions]]
+----
+PUSH1 0x4
+CALLDATASIZE
+LT
+PUSH1 0x3f
+JUMPI
+----
+
+“PUSH1 0x4”将0x4放置在堆栈顶部，否则为空。“CALLDATASIZE”获取接收到的交易的calldata的字节大小并将其压入堆栈。当前的堆栈如下所示: 
+
+.Current stack
+[width="40%",frame="topbot",options="header,footer"]
+|======================
+|Stack
+|0x4
+|length of calldata from tx (msg.data)
+|======================
+
+下一条指令是“LT”，“小于”的简称。LT指令检查堆栈中的顶层项目是否小于堆栈中的下一个项目。在我们的例子中，它检查CALLDATASIZE的结果是否小于4个字节。
+
+为什么EVM检查看到交易的calldata至少有4个字节？由于函数标识符的工作原理。每个函数由其keccak256哈希的前四个字节标识。通过放置函数的名字以及它在keccak256哈希函数中使用的参数，我们可以推导出它的函数标识符。在我们的合约中，我们有: 
+
+[[faucet_function_identifier]]
+```
+keccak256("withdraw(uint256)") = 0x2e1a7d4d...
+```
+
+因此，“withdraw(uint256)”函数的函数标识符是0x2e1a7d4d，因为这些是结果散列的前四个字节。函数标识符总是4个字节长，所以如果发送到合约的交易的整个数据字段少于4个字节，那么除非定义了 _fallback函数_ ，否则没有函数可以与交易进行通信。因为我们在Faucet.sol中实现了这样的回退函数，所以当calldata的长度小于4字节时，EVM跳转到这个函数。
+
+如果msg.data字段小于4个字节，则LT弹出堆栈的前两个值并将1推到其上。否则，它将推0。在我们的例子中，让我们假设发送到我们的合约 _was_ 小于4个字节的transaciton的msg.data字段。
+
+“PUSH1 0x3f”指令将字节“0x3f”压入堆栈。在这条指令之后，堆栈如下所示: 
+
+.Current stack
+[width="40%",frame="topbot",options="header,footer"]
+|======================
+|Stack
+|1
+|0x3f
+|======================
+
+下一条指令是“JUMPI”，代表“jump if”。它的工作原理如下: 
+
+[[faucet_jump_instruction_text]]
+----
+jumpi(label, cond) // Jump to "label" if "cond" is true
+----
+
+在我们的例子中，“label”是0x3f，这是我们的回退函数存在于我们的智能合约中的地方。“cond”参数是1，这是来自LT指令的结果。为了将整个后缀放入单词中，如果交易数据小于4个字节，则合约将跳转到回退函数。
+
+在0x3f处，只有一个“STOP”指令，因为尽管我们声明了一个后备函数，但我们保持它为空。如果我们没有实现回退函数，合约会抛出异常。
+
+[[Faucet_jumpi_instruction]]
+.JUMPI指令导致回退函数
+image::images/Faucet_jumpi_instruction.png["JUMPI instruction leading to fallback function"]
+
+让我们来看看调度器的中央区块。假设我们收到长度大于4个字节的calldata，则“JUMPI”指令不会跳转到回退函数。相反，代码执行会遵循下一条指令: 
+
+[[faucet_instructions]]
+----
+PUSH1 0x0
+CALLDATALOAD
+PUSH29 0x1000000...
+SWAP1
+DIV
+PUSH4 0xffffffff
+AND
+DUP1
+PUSH4 0x2e1a7d4d
+EQ
+PUSH1 0x41
+JUMPI
+----
+
+“PUSH1 0x0”将0推入堆栈，否则为空。“CALLDATALOAD”接受发送到智能合约的calldata内的索引作为参数，并从该索引读取32个字节，如下所示: 
+
+[[faucet_calldataload_instruction_text]]
+----
+calldataload(p) // call data starting from position p (32 bytes)
+----
+
+由于0是从PUSH1 0x0命令传递给它的索引，因此CALLDATALOAD从字节0开始读取32字节的calldata，然后将其压入堆栈的顶部（在弹出原始0x0之后）。在“PUSH29 0x1000000 ...”指令之后，堆栈如下所示: 
+
+.Current stack
+[width="40%",frame="topbot",options="header,footer"]
+|======================
+|Stack
+|32 bytes of calldata starting at byte 0
+|0x1000000... (29 bytes in length)
+|======================
+
+“SWAP1”在堆栈后面用 _ith_ 元素切换顶层元素。在这种情况下，它使用calldata交换0x1000000 ...。新的堆栈如下所示: 
+
+.Current stack
+[width="40%",frame="topbot",options="header,footer"]
+|======================
+|Stack
+|0x1000000... (29 bytes in length)
+|32 bytes of calldata starting at byte 0
+|======================
+
+下一条指令是“DIV”，其工作原理如下: 
+
+[[faucet_div_instruction_text]]
+----
+div(x, y) // x / y
+----
+
+在这种情况下，从字节0开始x = 32字节的calldata，并且y = 0x100000000 ...（共29字节）。你能想到调度器为什么做这个除法吗？这里有一个提示: 我们从索引0开始从calldata读取32个字节。该calldata的前四个字节是函数标识符。
+
+
+我们先前推送的0x100000000 ...的长度是29个字节，由1开始，然后是全0。将我们的32字节的calldata除以0x100000000 ....将仅剩下从索引0开始的我们的calldataload的 _topmost 4个字节_ 。这四个字节 - 从索引0开始的calldataload中的前四个字节是函数标识符，并且这就是EVM如何提取该字段。
+
+如果你不清楚这部分，你可以这样想: 基数~10~, 1234000 / 1000 = 1234。在基数~16~，这个没有什么不同。而不是每个地方都是10的倍数，它是16的倍数。就像在我们小例子中除以 10^3^ (1000)只保留最上面的数字一样，将32字节的base~16~值除以16^29^也一样。
+
+DIV（函数标识符）的结果被压入堆栈，而我们的新堆栈如下所示: 
+
+.Current stack
+[width="40%",frame="topbot",options="header,footer"]
+|======================
+|Stack
+|function identifier sent in msg.data
+|======================
+
+由于“PUSH4 0xffffffff”和“AND”指令是多余的，我们可以完全忽略它们，因为堆栈在完成后将保持不变。“DUP1”指令复制堆栈中的1^st^ 项目，这是函数标识符。下一条指令“PUSH4 0x2e1a7d4d”将 withdraw(uint256)函数的计算函数标识符压入堆栈。堆栈现在看起来如下所示: 
+
+.Current stack
+[width="40%",frame="topbot",options="header,footer"]
+|======================
+|Stack
+|function identifier sent in msg.data
+|function identifier sent in msg.data
+|0x2e1a7d4d
+|======================
+
+下一条指令“EQ”弹出堆栈的前两项并对它们进行比较。这是调度员完成其主要工作的地方: 它比较在交易的msg.data字段中发送的函数标识符是否与withdraw(uint256)的函数标识符相匹配。如果它们相等，则EQ将1推到堆栈上，最终将被用于跳转到撤销功能。否则，EQ将0推入堆栈。
+
+假设发送给我们合约的交易确实以withdraw(uint256)函数标识符开头，我们的新堆栈如下所示: 
+
+.Current stack
+[width="40%",frame="topbot",options="header,footer"]
+|======================
+|Stack
+|function identifier sent in msg.data
+|1
+|======================
+
+接下来，我们有“PUSH1 0x41”，这是withdraw(uint256) 函数在合约中的地址。在这条指令之后，堆栈如下所示: 
+
+.Current stack
+[width="40%",frame="topbot",options="header,footer"]
+|======================
+|Stack
+|function identifier sent in msg.data
+|1
+|0x41
+|======================
+
+接下来是JUMPI指令，它再次接受堆栈中的前两个元素作为参数。在这种情况下，我们有“jumpi(0x41, 1)”，它告诉EVM执行跳转到withdraw(uint256)函数的位置。
+
+[[evm_tools_references]]
+=== EVM工具参考
+* [ByteCode To Opcode Disassembler]（https://etherscan.io/opcode-tool）（用于检查/调试，如果编译以完整方式运行，并且在源代码未发布时用于反向工程目的）
