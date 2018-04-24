@@ -1,0 +1,223 @@
+[[decentralized_applications_chap]]
+== 去中心应用程序（DApps）
+
+////
+TODO：添加段落
+////
+
+[[what_is_a_dapp_sec]]
+=== 什么是DApp？
+
+与传统应用程序不同，去中心应用程序（DApp）不仅仅属于一个单独的提供者或服务器，而是整个堆栈以分布式方式在对等网络上部署和运行。
+
+典型的DApp堆栈将由前端、后端和数据存储组成。创建一个典型的集中式架构无法提供的DApp有很多优点：
+
+1）弹性：将业务逻辑写入智能合约意味着DApp后端将在区块链上完全分布和管理。与在中央服务器上部署应用程序不同，DApp没有停机时间，只要区块链仍在运行，它将继续保留。
+
+2）透明度：DApp的开源特性允许任何人分叉代码，并在区块链上运行相同的应用程序。在同一笔记中，任何与区块链的交互都将永久存储，任何拥有区块链副本的人都可以访问它。值得注意的是，可能无法将字节码解码为源代码并完全理解合约的代码。试图提供关于合约行为的完全透明度的开发人员必须发布用户阅读、编译和验证的源代码。
+
+3）审查阻力：只要用户可以访问以太坊节点，用户就可以始终与DApp交互，而不受集中控制的干扰。一旦在网络上部署代码，服务提供商甚至智能合约的拥有者都不能更改代码。
+
+[[components_of_a_dapp_sec]]
+=== DApp的组件
+
+////
+TODO：添加段落
+////
+
+[[blockchain_smart_contracts_sec]]
+==== 区块链（智能合约）
+
+智能合约用于存储去中心应用程序的业务逻辑、状态和计算;可以将智能合约视为常规应用程序中的服务器端组件。
+
+在以太坊智能合约上部署服务器端逻辑的一个优点是您可以构建一个更复杂的架构，其中智能合约可以相互读取和写入数据。在部署您的智能合约之后，未来许多其他开发人员可以使用您的业务逻辑，而无需管理和维护代码。
+
+将智能合约作为核心业务逻辑功能运行的一个主要问题是无法在代码部署后更改代码。此外，一个非常大的单片智能合约可能会耗费大量的气体进行部署和运行。因此一些应用程序可能会选择具有脱链计算和外部数据源。但请记住，DApp的核心业务逻辑依赖于外部数据或服务器，这意味着您的用户将不得不信任这些外部因素。
+
+[[front_end_web_ui_cec]]
+==== 前端（Web用户界面（UI））
+
+与需要开发人员理解EVM和Solidity等新语言的DApp的业务逻辑不同，DApp的客户端界面使用基本的Web前端技术（HTML，CSS，JavaScript）。这使传统的Web开发人员能够使用他们熟悉的工具、库和框架。与DApp的交互，如签署消息、发送交易和密钥管理，通常通过浏览器本身使用诸如Mist浏览器或Metamask浏览器扩展等工具进行。
+
+虽然也可以创建移动DApp，但由于缺乏可用作具有密钥管理功能的轻量级客户端的移动客户端，因此目前没有创建移动DApp前端的最佳实践。
+
+[[data_storage_sec]]
+==== 数据存储
+
+由于燃料成本高昂，智能合约目前不适合存储大量数据。因此，大多数DApps将利用IPFS或Swarm等去中心存储来存储和分发大型静态资产，如图像、视频和客户端应用程序（HTML、CSS、JavaScript）。
+
+内容的散列通常使用键值映射在智能合约中以字节存储。然后，资产将通过您的前端应用程序进行检索，并根据智能合约调用每个资产的URL。
+
+[[on_chain_vs_off_chain_data_sec]]
+===== 链上和链外
+
+////
+TODO：添加段落
+////
+
+[[ipfs_sec]]
+===== IPFS
+
+////
+TODO：添加段落
+////
+
+[[swarm_sec]]
+===== Swarm
+
+Swarm主页; http://swarm-gateways.net/bzz:/theswarm.eth/
+
+阅读文档; https://swarm-guide.readthedocs.io/en/latest/index.html
+
+Swarm开发者入门指南; https://github.com/ethersphere/swarm/wiki/swarm
+
+Swarm引擎室; https://gitter.im/ethersphere/orange-lounge
+
+以太坊Swarm和IPFS的异同; https://github.com/ethersphere/go-ethereum/wiki/IPFS-&-SWARM
+
+[[centralized_db_sec]]
+===== 集中数据库
+
+////
+TODO：添加段落
+////
+
+[[oracle_sec]]
+===== Oracle
+
+////
+TODO：添加段落
+////
+
+[[interdapp_coammunications_protocol_sec]]
+==== Inter-DApp通讯协议
+
+////
+TODO：添加段落
+////
+
+[[whisper_sec]]
+===== Whisper
+
+////
+TODO：添加段落
+////
+https://github.com/ethereum/wiki/wiki/Whisper
+
+https://github.com/ethereum/wiki/wiki/Whisper-Overview
+
+[[dapp_frameworks_sec]]
+=== DApp框架
+
+有许多不同的开发框架和用许多语言编写的库，可以使开发人员在创建和部署DApp时获得更好的体验。
+
+[[truffle_sec]]
+==== Truffle
+Truffle是流行的选择，为以太坊提供了一个可管理的开发环境、测试框架和资产管道。
+
+用Truffle，你会得到：
+
+* 内置智能合约编译、链接、部署和二进制管理。
+* 配合Mocha和Chai进行自动合约测试。
+* 可配置的构建流水线，支持自定义构建流程。
+* 脚本部署和迁移框架。
+* 部署到许多公共和私人网络的网络管理。
+* 直接合约沟通的交互式控制台。
+* 在开发过程中即时重建资产。
+* 在Truffle环境中执行脚本的外部脚本运行器。
+
+入门和文档; http://truffleframework.com/docs
+
+Github链接; https://github.com/trufflesuite/truffle
+
+网站链接; https://truffleframework.com
+
+[[embark_sec]]
+==== Embark
+Embark框架侧重于使用以太坊、IPFS和其他平台的无服务器去中心应用程序。Embark目前与EVM区块链（Ethereum）、去中心存储（IPFS）和去中心通信平台（Whisper和Orbit）集成。
+
+使用Embark你可以：
+
+** 区块链（以太坊）
+* 自动部署合约，并使它们在您的JS代码中可用。开始观察变化，如果更新合约，Embark将自动重新部署合约（如果需要）和DApp。
+* 有Promises的JS可以使用合约。
+* 使用Javascript进行测试驱动开发合约。
+* 跟踪部署的合约; 只在真正需要时部署。
+* 管理不同的链（例如testnet、私有网络、livenet）
+* 轻松管理复杂的相互依赖合约系统。
+
+** 去中心存储（IPFS）
+* 通过EmbarkJS轻松存储和检索DApp上的数据，包括上传和检索文件。
+* 将完整的应用程序部署到IPFS或Swarm。
+
+
+** 去中心沟通（Whisper、Orbit）
+* 通过Whisper或Orbit轻松通过P2P通道发送/接收消息。
+
+** Web技术
+* 整合任何web技术，包括React、Foundation等。
+* 使用任何你想要的构建管道或工具，包括grunt、gulp和webpack。
+
+入门和文档; https://embark.readthedocs.io
+
+Github链接; https://github.com/embark-framework/embark
+
+网站链接; https://github.com/embark-framework/embark
+
+[[dapp_develotment_tool_sec]
+==== DApp（开发工具）
+DApp是用于智能合约开发的简单命令行工具。它支持这些常见的用例：
+
+* 包管理
+* 源代码构建
+* 单元测试
+* 简单的合约部署
+
+入门和文档; https://dapp.readthedocs.io/en/latest/
+
+[[populous_sec]]
+==== Populous
+
+////
+TODO：添加段落
+////
+
+[[live_dapps_sec]]
+=== Live DApps
+
+这里列出了以太坊网络上不同的live DApps：
+
+////
+TODO：添加段落
+////
+
+[[ethpm_sec]]
+==== EthPM
+一个旨在将包管理带入以太坊生态系统的项目。
+
+网站链接; https://www.ethpm.com/
+
+[[radar_relay_sec]]
+==== Radar中继
+DEX（去中心交易所）专注于直接从钱包到钱包交易以太坊代币。
+
+网站链接; https://radarrelay.com/
+
+[[cryptokitties_sec]]
+==== CryptoKitties
+部署在以太坊上的游戏允许玩家购买、收集、培育和出售各种类型的虚拟猫
+它代表了为休闲和休闲目的部署区块链技术的最早尝试之一。
+
+网站链接; https://www.cryptokitties.co
+
+[[ethlance_sec]]
+==== Ethlance
+Ethlance是一个连接自由职业者和开发者的平台，使用以太币支付和收款。
+
+网站链接; https://ethlance.com/
+
+[[decentraland_sec]]
+==== Decentraland
+Decentraland是以太坊区块链支持的虚拟现实平台。用户可以创建、体验和通过内容和应用获利。
+
+网站链接; https://decentraland.org/
