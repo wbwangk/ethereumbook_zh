@@ -101,6 +101,7 @@ parity --chain kovan
 https://www.ethnews.com/ropsten-to-kovan-to-rinkeby-ethereums-testnet-troubles
 
 === 工作证明（采矿）与权威证明（联合签名）
+
 https://github.com/ethereum/guide/blob/master/poa.md
 
 === Morden（原始测试网）
