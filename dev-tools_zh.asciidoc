@@ -393,9 +393,9 @@ Options:
 
 === dapp.tools
 
-https://dapp.tools/ 
+https://dapp.tools/
 
-安装:
+Installing:
 ----
 $ curl https://nixos.org/nix/install | sh
 $ nix-channel --add https://nix.dapphub.com/pkgs/dapphub
