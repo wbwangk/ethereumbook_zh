@@ -178,7 +178,7 @@ Kovan（网络ID：42）是由Parity的权威证明（PoA）共识算法驱动�
 
 Rinkeby（网络ID：4）是由以太坊团队于2017年4月开始的Homestead发布的Geth测试网络，并使用PoA共识协议。以斯德哥尔摩的地铁站命名，它几乎不受垃圾交易攻击的影响（因为以太币供应由受信任方控制）。请参阅EIP 225：https://github.com/ethereum/EIPs/issues/225
 
-===工作证明（采矿）与权威证明（联合签名）
+=== 工作证明（采矿）与权威证明（联合签名）
 https://github.com/ethereum/guide/blob/master/poa.md
 
 TODO：写出两种机制的优点和缺点
