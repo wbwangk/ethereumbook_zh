@@ -1,368 +1,524 @@
-[preface]
-== Quick Glossary
+[[intro_chapter]]
+== Ethereum Basics
 
-This quick glossary contains many of the terms used in relation to Ethereum. These terms are used throughout the book, so bookmark this for a quick reference.
+[[control_responsibility]]
+=== Control and responsibility
 
-////
+Open blockchains like Ethereum are secure because they are _decentralized_. That means that each user of Ethereum should control their own keys, which control access to their funds and contracts. Some users choose to give up control over their keys by using a third party custodian, such as an exchange wallet. In this book, we will teach you how to take control and manage your own keys.
 
-Please add terms here, by doing a pull request!
+With that control comes a big responsibility. If you lose your keys, you lose access to funds and contracts. No one can help you regain access - your funds will be locked forever. Here are a few tips to help you manage this responsibility:
 
-If you can't write a definition, then do a pull request to add only the words you think should be defined and leave the definition empty for someone else to add later.
+* When you are prompted to choose a password: make it strong, back it up and don't share it. If you don't have a password manager, write it down and store it in a locked drawer or safe. This password can be used as long as you have the "keystore" file of your account.
 
-Comment from Gitter:
-    Andreas M. Antonopoulos @aantonop mar. 26 19:42 (2018)
-    Capitalize ALL THE WORDS
+* When you are prompted to back up a key or mnemonic words, use pen and paper to make a physical backup. Do not leave that task for "later", you will forget. These can be used in case you lose all data saved on your system.
 
-////
+* Do not store key material (encrypted or not) in digital documents, digital photos, screenshots, online drives, encrypted PDFs, etc. Don't improvise security. Use a password manager or pen and paper.
 
-Account::
-    An object containing an address, balance and nonce, and optional storage and code. An account can be a contract account or an EOA (externally owned account).
+* Before transferring any large amounts, first do a small test transaction (e.g., $1 value). Once you receive the test transaction, try sending it from that wallet. If you forgot your password or can't send the funds for any other reason, it is better to find out with a small loss.
 
-Address::
-    Most generally, this represents an EOA or contract, which can receive (destination address) or send (source address) transactions on the blockchain. More specifically, it is the right most 160-bits of a Keccak hash of an ECDSA public key.
+* Do not send money to any of the addresses shown in this book. The private keys are listed in the book and someone will immediately take that money.
 
-Assert::
-    In Solidity assert(false) compiles to *0xfe*, which is an invalid opcode, using up all remaining gas, and reverting all changes.
-    When an assert() statement fails, something very wrong and unexpected should be happening, and you will need to fix your code.
-    You should use assert to avoid conditions which should never, ever be possible.
+[[ether_units]]
+=== Ether currency units
 
-Big-endian::
-    A positional number representation where the most significant digit is first. The opposite of little-endian where the least significant digit is first.
+Ethereum's currency unit is called _ether_, identified also as ETH or with the symbols &#926; (from the Greek letter "Xi" that looks like a stylized capital E) or (less often) &#9830;, for example, 1 ether, or 1 ETH, or &#926;1, or &#9830;1
 
-BIP::
-    Bitcoin Improvement Proposals.  A set of proposals that members of the Bitcoin community have submitted to improve Bitcoin. For example, BIP-21 is a proposal to improve the Bitcoin uniform resource identifier (URI) scheme.
+[TIP]
+====
+Use Unicode character 926 for &#926; and 9830 for &#9830;.
+====
 
-Block::
-    A block is added to the Ethereum network by miners and is a collection of required information (a block header) about the comprised transactions, and a set of other block headers known as ommers.
+Ether is subdivided into smaller units, down to the smallest unit possible, which is named _wei_. One _ether_ is 1 quintillion _wei_ (1 x 10^18^ or 1,000,000,000,000,000,000). You may hear people refer to the currency "Ethereum" too, but this is a common beginner's mistake. Ethereum is the system, ether is the currency.
 
-Blockchain::
-	A sequence of blocks validated by the proof-of-work system, each linking to its predecessor all the way to the genesis block. This varies from the Bitcoin protocol's in that it does not have a block size limit, it instead uses varying gas limits.
+The value of ether is always represented internally in Ethereum as an unsigned integer value denominated in _wei_. When you transact 1 ether, the transaction encodes 10000000000000000000 wei as the value.
 
-Byzantium::
-  Byzantium is the first of two hard forks for Metropolis development stage. It included EIP-649: Metropolis Difficulty Bomb Delay and Block Reward Reduction, where the Ice Age (see below) was delayed by 1 year, and the block reward was reduced from 5 to 3 ether.
+Ether's various denominations have both a _scientific name_ using the International System of units (_SI_), and a colloquial name that pays homage to many of the great minds of computing and cryptography.
 
-Compiling::
-	Converting code written in a high-level programming language (e.g. Solidity) into a lower level language (e.g. EVM bytecode).
+Table <<ether_denominations>> shows the various units, their colloquial (common) name, and their SI name. In keeping with the internal representation of value, the table shows all denominations in wei (first row), with ether shown as 10^18^ wei in the 7th row:
 
-Consensus::
-    When several nodes, usually most nodes on the network, all have the same blocks in their locally-validated best block chain.
-    Not to be confused with consensus rules.
+[[ether_denominations]]
+.Ether Denominations and Unit Names
+[options="header"]
+|===
+| Value (in wei) | Exponent | Common Name | SI Name
+| 1 | 1 | wei | wei
+| 1,000 | 10^3^ | babbage | kilowei or femtoether
+| 1,000,000 | 10^6^ | lovelace | megawei or picoether
+| 1,000,000,000 | 10^9^ | shannon | gigawei or nanoether
+| 1,000,000,000,000 | 10^12^ | szabo | microether or micro
+| 1,000,000,000,000,000 | 10^15^ | finney | milliether or milli
+| _1,000,000,000,000,000,000_ | _10^18^_ | _ether_ | _ether_
+| 1,000,000,000,000,000,000,000 | 10^21^ | grand | kiloether
+| 1,000,000,000,000,000,000,000,000 | 10^24^ | | megaether
+|===
 
-Consensus rules::
-    The block validation rules that full nodes follow to stay in consensus with other nodes. Not to be confused with consensus.
+[[choosing_eth_wallet]]
+=== Choosing an Ethereum wallet
 
-Constantinople::
-  The second part of the Metropolis stage, planned for mid-2018. Expected to include a switch to hybrid Proof-of-Work/Proof-of-Stake consensus algorithm, among other changes.
+An Ethereum wallet is your gateway to the Ethereum system. It holds your keys and can create and broadcast transactions on your behalf. Choosing an Ethereum wallet can be difficult because there are many different options with different features and designs. Some are more suitable for beginners and some are more suitable for experts. Even if you choose one that you like now, you might decide to switch to a different wallet later on. Ethereum itself is constantly changing and the "best" wallets are often the ones that adapt to them.
 
-Contract account::
-    An account containing code that executes whenever it receives a transaction from another account (EOA or contract).
+But don't worry! If you choose a wallet and don't like how it works, you can change wallets quite easily. All you have to do is make a transaction that sends your funds from the old wallet to the new wallet, or move the keys by exporting and importing your private keys.
 
-Contract creation transaction::
-	A special transaction, with the "zero address" as the recipient, that is used to register a contract and record it on the Ethereum blockchain (see "zero address").
+To get started, we will choose three different types of wallets to use as examples throughout the book: a mobile wallet, a desktop wallet, and a web-based wallet. We've chosen these three wallets because they represent a broad range of complexity and features. However, the selection of these wallets is not an endorsement of their quality or security. They are simply a good starting place for demonstrations and testing.
 
-DApp::
-    Decentralised Application. At the very least, it is a smart contract and a web user-interface. More broadly, a DApp is a web application that is built on top of open, decentralized, peer-to-peer infrastructure services. In addition, many DApps include decentralized storage and/or message protocol and platform.
+Starter wallets:
 
-DAO::
-  Decentralised Autonomous Organization. Companies and other organizations which operate without hierarchical management. Also may refer to a contract named "The DAO" launched on 30th April 2016, which was then hacked in June 2016 and ultimately motivated a hard fork (codenamed DAO) at block #1,192,000 that reversed the hacked DAO contract and caused Ethereum and Ethereum Classic to split into two competing systems.
+MetaMask:: MetaMask is a browser extension wallet that runs in your browser (Chrome, Firefox, Opera or Brave Browser). It is easy to use and convenient for testing, as it is able to connect to a variety of Ethereum nodes and test blockchains (see <<testnets>>).
 
-Deed::
-  Non-fungible token standard introduced in ERC721 proposal. Unlike ERC20 tokens, deeds prove ownership and are not interchangeable, though they are not recognized as "legal documents" in any jurisdiction, at least not currently.
+Jaxx:: Jaxx is a multi-platform and multi-currency wallet that runs on a variety of operating systems including Android, iOS, Windows, Mac, and Linux. It is often a good choice for new users as it is designed for simplicity and ease of use.
 
-Difficulty::
-  A network-wide setting that controls how much computation is required to produce a proof of work.
+MyEtherWallet (MEW):: MyEtherWallet is a web-based wallet that runs in any browser. It has multiple sophisticated features we will explore in many of our examples.
 
-Digital signature::
-  A digital signing algorithm is a process by which a user can produce a short string of data called a "signature" of a document using a private key such that anyone with the corresponding public key, the signature and the document can verify that (1) the document was "signed" by the owner of that particular private key, and (2) the document was not changed after it was signed.
+We'll start by installing MetaMask on our desktop.
 
-ECDSA::
-    Elliptic Curve Digital Signature Algorithm or ECDSA is a cryptographic algorithm used by Ethereum to ensure that funds can only be spent by their rightful owners.
+[[installing_MetaMask]]
+=== Installing MetaMask
 
-EIP::
-    Ethereum Improvement Proposals are standards for the Ethereum platform. An EIP is a design document providing information to the Ethereum community, describing a new feature or its processes or environment. For more information, see https://github.com/ethereum/EIPs (also see the definition for ERC, below).
+Open the Google Chrome browser and navigate to:
 
-Entropy::
-    In the context of Cryptography, lack of predictability or level of randomness. When generating secret information, such as master private keys, algorithms usually rely on a source of high entropy to ensure the output is unpredictable.
+https://chrome.google.com/webstore/category/extensions
 
-ENS::
-  Ethereum Name Service. For more information, see https://github.com/ethereum/ens/
+Search for "MetaMask" and click on the logo of a fox. You should see the extension's detail page like this:
 
-EOA::
-    Externally Owned Account. These are accounts created by or for human users of the Ethereum network.
+[[metamask_download]]
+.The detail page of the MetaMask Chrome Extension
+image::images/metamask_download.png["MetaMask Detail Page"]
 
-ERC::
-    Ethereum Request for Comments. Some EIPs are labeled as ERCs, which denotes proposals attempting to define a specific standard of Ethereum usage.
+It's important to verify that you are downloading the real MetaMask extension, as sometimes people are able to sneak malicious extensions past Google's filters. The real one:
 
-// Should we use version numbers or release names?
-Ethash::
-    A Proof-of-Work algorithm for Ethereum 1.0. For more information, see https://github.com/ethereum/wiki/wiki/Ethash
+* Shows the ID +nkbihfbeogaeaoehlefnkodbefgpgknn+ in the address bar
+* Is offered by https://metamask.io
+* Has more than 800 reviews
+* Has more than 1,000,000 users
 
-Ether::
-    Ether is the native cryptocurrency used by the Ethereum ecosystem that covers gas costs when executing Smart Contracts. Its symbol is Ξ, the Greek uppercase Xi character.
+Once you confirm you are looking at the correct extension, click "Add to Chrome" to install it.
 
-Event::
-    An event allows the use of EVM logging facilities, which in turn can be used to “call” JavaScript callbacks in the user interface of a DApp, which listen for these events. For more information, see http://solidity.readthedocs.io/en/develop/contracts.html#events
+[[using_MetaMask]]
+=== Using MetaMask for the first time
 
-EVM::
-    Ethereum Virtual Machine. The EVM is a simple stack-based architecture. In Ethereum, the execution model specifies how the system state is altered given a series of bytecode instructions and a small tuple of environmental data.
-    This is specified through a formal model of a virtual state machine, known as the Ethereum Virtual Machine (EVM).
+Once MetaMask is installed you should see a new icon (head of a fox) in your browser's toolbar. Click on it to get started. You will be asked to accept the terms and conditions and then to create your new Ethereum wallet by entering a password:
 
-EVM Assembly Language::
-    A human-readable form of EVM-code.
+[[metamask_password]]
+.The password page of the MetaMask Chrome Extension
+image::images/metamask_password.png["MetaMask Password Page"]
 
-Fallback function::
-    It's like a fishing net to catch all the ether that is sent to a contract.
+[TIP]
+====
+The password controls access to MetaMask, so that it can't be used by anyone with access to your browser.
+====
 
-Faucet::
-  A website that dispenses rewards in the form of free test ether for developers who want to do test on testnets.
+Once you've set a password, MetaMask will generate a wallet for you and show you a _mnemonic backup_ consisting of 12 English words. These words can be used in any compatible wallet to recover access to your funds should something happen to MetaMask or your computer. You do not need the password for this recovery.  The 12 words are sufficient.
 
-Frontier::
-  The initial test development stage of Ethereum, lasted from July 30th 2015 to March 2016.
+[[metamask_mnemonic]]
+.The mnemonic backup of your wallet, created by MetaMask
+image::images/metamask_mnemonic.png["MetaMask Mnemonic Page"]
 
-Ganache::
-  Personal Ethereum blockchain which you can use to run tests, execute commands, and inspect state while controlling how the chain operates.
+[TIP]
+====
+Backup your mnemonic (12 words) on paper, twice. Store the two paper backups in two separate secure locations, such as a fire resistant safe, a locked drawer or a safe deposit box. Treat the paper backups like cash of equivalent value as what you store in your Ethereum wallet. Anyone with access to these words can gain access and steal your money.
+====
 
-// The word currency here might 'clash' with Ether.
-//
+Once you have confirmed that you have stored the mnemonic securely, MetaMask will display your Ethereum account details:
 
-TODO: Change for Clarity
+[[metamask_account]]
+.Your Ethereum account in MetaMask
+image::images/metamask_account.png["MetaMask Account Page"]
 
-//
-Gas::
-    A virtual fuel used in Ethereum to execute smart contracts. The Ethereum Virtual Machine uses an accounting mechanism to measure the consumption of gas and constrain (limit) the consumption of computing resources. See Turing-Complete.
-    Gas is a unit of computation that is incurred per instruction of Smart Contract executed. The gas is pegged at Ether cryptocurrency. The gas is analogous to talk time on a cellular network. Thus, the price of running a transaction in fiat currency is `gas * (ETH/gas) * (fiat currency/ETH)`.
+Your account page shows the name of your account ("Account 1" by default), an Ethereum address (0x9E713... in the example) and a colorful icon to help you visually distinguish this account from other accounts. At the top of the account page, you can see which Ethereum network you are currently working on ("Main Network" in the example).
 
-Gas limit::
-  When talking about blocks, they too, have a field called gas limit. It defines the maximum amount of gas all transactions in the whole block combined are allowed to consume.
+Congratulations! You have set up your first Ethereum wallet!
 
-Genesis block::
-	The first block in the blockchain, used to initialize a particular network and its cryptocurrency.
+[[switching_networks]]
+=== Switching networks
 
-Geth::
-  Go Ethereum. One of the most prominent implementations of the Ethereum protocol written in Go.
+As you can see on the MetaMask account page, you can choose between multiple Ethereum networks. By default, MetaMask will try to connect to the "Main Network". The other choices are public testnets, any Ethereum node of your choice, or nodes running private blockchains on your own computer (localhost):
 
-Hard fork::
-  Hard fork, also known as Hard-Forking Change, is a permanent divergence in the blockchain, commonly occurs when non-upgraded nodes can't validate blocks created by upgraded nodes that follow newer consensus rules. Not to be confused with fork, soft fork, software fork or Git fork.
+Main Ethereum Network:: The main, public, Ethereum blockchain. Real ETH, real value, real consequences.
 
-Hash::
-   A fixed-length fingerprint of variable-size input produced by a hash function.
+Ropsten Test Network:: Ethereum public test blockchain and network, using Proof-of-Work consensus (mining). ETH on this network has no value. The issue with Ropsten was that the attacker minted tens of thousands of blocks, producing huge reorgs and pushing the gas limit up to 9B. A new public testnet was required then, but later(on 25th March 2017) Ropsten was also revived!
 
-HD wallet::
-    Wallets using the Hierarchical Deterministic (HD Protocol) key creation and transfer protocol (BIP32).
+Kovan Test Network:: Ethereum public test blockchain and network, using "Aura" protocol for Proof-of-Authority consensus (federated signing). ETH on this network has no value. This test network is supported by "Parity" only. Other Ethereum clients use 'Clique' protocol, which was proposed later, for Proof-of-Authority.
 
-////
+Rinkeby Test Network:: Ethereum public test blockchain and network, using "Clique" protocol for Proof-of-Authority consensus (federated signing). ETH on this network has no value.
 
-TODO change for clarity
+Localhost 8545:: Connect to a node running on the same computer as the browser. The node can be part of any public blockchain (main or testnet), or a private testnet (see <<ganache>>).
 
-////
-HD wallet seed::
-    HD wallet seed or root seed is a potentially-short value used as a seed to generate the master private key and master chain code for an HD wallet. The wallet seed can be represented by mnemonic words making it easier for humans to copy, backup and restore private keys.
+Custom RPC:: Allows you to connect MetaMask to any node with a geth-compatible Remote Procedure Call (RPC) interface. The node can be part of any public or private blockchain.
 
-Homestead::
-  The second development stage of Ethereum, launched in March 2016 at block #1,150,000.
+For more information about the various Ethereum testnets and how to choose between them, see <<testnets>>.
 
-Ice Age::
-  A hard fork of Ethereum at block #200,000 to introduce an exponential difficulty increase (aka Difficulty Bomb), motivating a transition to Proof-of-Stake.
+[TIP]
+====
+Your MetaMask wallet uses the same private key and Ethereum address on all the networks it connects to. However, your Ethereum address balance on each Ethereum network will be different. Your keys may control ether and contracts on Ropsten, for example, but not on the Main Network.
+====
 
-// In case of Ethereum, perhaps, includes a blockchain explorer too?
-IDE (Integrated Development Environment)::
-	An integrated user interface that combines a code editor, compiler, runtime, and a debugger.
+[[getting_test_eth]]
+=== Getting some test ether
 
-Immutable Deployed Code Problem::
-  Once a contract's (or library's) code is deployed it becomes immutable. Being able to fix possible bugs and add new features is key for the software development cycle. This represents a challenge for smart contract development.
+Our first task is to get our wallet funded. We won't be doing that on the Main Network because real ether costs money and handling it requires a bit more experience. For now, we will load our wallet with some testnet ether.
 
-Inter exchange Client Address Protocol (ICAP)::
-  An Ethereum Address encoding that is partly compatible with the International Bank Account Number (IBAN) encoding, offering a versatile, checksummed and interoperable encoding for Ethereum Addresses. ICAP addresses can encode Ethereum Addresses or common names registered with an Ethereum name registry. They always begin with XE. The aim is to introduce a new IBAN country code: XE, Ethereum E prefixed with the "extended" X, as used in non-jurisdictional currencies (e.g. XBT, XRP, XCP).
+Switch MetaMask to the _Ropsten Test Network_. Then click "Buy", and click "Ropsten Test Faucet". MetaMask will open a new web page:
 
-Internal transaction (also "message")::
-    A transaction sent from a contract account to another contract account or an EOA.
+[[metamask_ropsten_faucet]]
+.MetaMask Ropsten Test Faucet
+image::images/metamask_ropsten_faucet.png["MetaMask Ropsten Test Faucet"]
 
-Keccak256::
-  Cryptographic hash function used in Ethereum. Keccak256 was standardised to SHA-3.
+You may notice that the web page already contains your MetaMask wallet's Ethereum address. MetaMask integrates Ethereum enabled web pages (see <<dapps>>) with your MetaMask wallet. MetaMask can "see" Ethereum addresses on the web page, allowing you, for example, to send a payment to an online shop displaying an Ethereum address. MetaMask can also populate the web page with your own wallet's address as a recipient address if the web page requests it. In this page, the faucet application is asking MetaMask for a wallet address to send test ether to.
 
-Key Derivation Function (KDF)::
-  Also known as a password stretching algorithm, it is used by keystore format which to protect against brute-force, dictionary, or rainbow table attacks against the passphrase encryption. It repeatedly hashes the passphrase.
+Press the green "request 1 ether from faucet" button. You will see a transaction ID appear in the lower part of the page. The faucet app has created a transaction - a payment to you. The transaction ID looks like this:
 
-Keystore File::
-  A JSON-encoded file that contains a single (randomly generated) private key, encrypted by a passphrase for extra security.
+[[faucet_tx_id]]
+----
+0x7c7ad5aaea6474adccf6f5c5d6abed11b70a350fbc6f9590109e099568090c57
+----
 
-LevelDB::
-  LevelDB is an open source on-disk key-value store. LevelDB is a light-weight, single-purpose library for persistence with bindings to many platforms.
+In a few seconds, the new transaction will be mined by the Ropsten miners and your MetaMask wallet will show a balance of 1 ETH. Click on the transaction ID and your browser will take you to a _block explorer_, which is a website that allows you to visualize and explore blocks, addresses, and transactions. MetaMask uses the +etherscan.io+ block explorer, one of the more popular Ethereum block explorers. The transaction containing our payment from the Ropsten Test Faucet is shown in <<ropsten_block_explorer>>
 
-Library::
-  A library in Ethereum is a special type of contract that has no payable functions, no fallback function, and no data storage. Therefore, it cannot receive or hold ether, or store data. A library serves as previously deployed code that other contracts can call for read-only computation.
+[[ropsten_block_explorer]]
+.Etherscan Ropsten Block Explorer
+image::images/ropsten_block_explorer.png["Etherscan Ropsten Block Explorer"]
 
-Lightweight client::
-  A lightweight client is an Ethereum client that does not store a local copy of the blockchain, or validate blocks and transactions. It offers the functions of a wallet and can create and broadcast transactions.
+The transaction has been recorded on the Ropsten blockchain and can be viewed at any time by anyone, simply by searching for the transaction ID, or visiting the link:
 
-////
+https://ropsten.etherscan.io/tx/0x7c7ad5aaea6474adccf6f5c5d6abed11b70a350fbc6f9590109e099568090c57
 
-TODO: Provide a crisp definition
+Try visiting that link, or entering the transaction hash into the +ropsten.etherscan.io+ website, to see it for yourself.
 
-////
+[[sending_eth_MetaMask]]
+=== Sending ether from MetaMask
 
-Merkle Patricia Tree::
+Once we've received our first test ether from the Ropsten Test Faucet, we will experiment with sending ether, by trying to send some back to the faucet. As you can see on the Ropsten Test Faucet page, there is an option to "donate" 1 ETH to the faucet. This option is available so that once you're done testing, you can return the remainder of your test ether, so that someone else can use it next. Even though test ether has no value, some people hoard it, making it difficult for everyone else to use the test networks. Hoarding test ether is frowned upon!
 
-Message::
-    An internal transaction that is never serialized and only sent within the EVM.
+Fortunately, we are not test ether hoarders and we want practice sending ether anyway.
 
-Metropolis::
-  Metropolis is the third development stage of Ethereum, launched in October 2017.
+Click on the orange "1 ether" button to tell MetaMask to create a transaction paying the faucet 1 ether. MetaMask will prepare a transaction and pop-up a window with the confirmation:
 
-METoken::
-  Mastering Ethereum Token. An ERC20 token used for demonstration in this book.
 
-Miner::
-    A network node that finds valid proof of work for new blocks, by repeated hashing.
+[[send_to_faucet]]
+.Sending 1 ether to the faucet
+image::images/send_to_faucet.png["Sending 1 ether to the faucet"]
 
-Mist::
-  Mist is the first ever Ethereum enabled browser, built by the Ethereum Foundation. It also contains a browser based wallet that was the first ever implementation of the ERC20 token standard (Fabian Vogelsteller, author of ERC20 was also the main developer in Mist). Mist was also the first wallet to introduce the camelCase checksum (EIP-155, see <<eip-155>>). Mist runs a full node, and offers a full DApp browser with support for Swarm based storage and ENS addresses.
+Oops! You probably noticed you can't complete the transaction. MetaMask says "Insufficient balance for transaction". At first glance this may seem confusing: we have 1 ETH, we want to send 1 ETH, why is MetaMask saying we have insufficient funds?
 
-Network::
-    A peer-to-peer network that propagates transactions and blocks to every Ethereum node (network participant).
+The answer is because of the cost of _gas_. Every Ethereum transaction requires payment of a fee, which is collected by the miners to validate the transaction. The fees in Ethereum are charged in a virtual currency called _gas_. You pay the gas with ether, as part of the transaction.
 
-Node::
-    A software client that is participating in the peer-to-peer network.
+[TIP]
+====
+Fees are required on the test networks too. Without fees, a test network would behave differently from the main network, making it an inadequate testing platform. Fees also protect the test networks from denial of service attacks and poorly constructed contracts (e.g. infinite loops), much like they protect the main network.
+====
 
-Nonce::
-    In cryptography, the term nonce is used to refer to a value that can only be used once. There are two types of nonce used in Ethereum.
+When you sent the transaction, Metamask calculated the average gas price of recent successful transactions at 3 GWEI, which stands for 3 gigawei. Wei is the smallest subdivision of the ether currency, as we discussed in <<ether_units>>. The gas cost of sending a basic transaction is 21000 gas units. Therefore, the maximum amount of ETH you spend is 3 * 21000 GWEI = 63000 GWEI = 0.000063 ETH. Be advised that average gas prices can fluctuate as they are predominantly determined by miners. We will see in a later chapter how you can increase/decrease your gas limit to ensure your transaction takes precedence if need be.
 
-     - Account nonce - It's simply the transaction count of an account.
-     - Proof of work nonce - The random value in a block that was used to get the proof of work satisfied (depending on the difficulty at the time).
+All this to say: to make a 1 ETH transaction costs 1.000063 ETH. MetaMask confusingly rounds that _down_ to 1 ETH when showing the total, but the actual amount you need is 1.000063 ETH and you only have 1 ETH. Click "Reject" to cancel this transaction.
 
-Ommer::
-    A child block of an ancestor that is not itself an ancestor. When a miner finds a valid block, another miner may have published a competing block which is added to the tip of the blockchain. Unlike bitcoin, orphaned blocks in Ethereum can be included by newer blocks as ommers and receive a partial block reward. The term "ommer" is the preferred gender neutral term for the sibling of a parent node, but is also referred to as an "uncle".
+Let's get some more test ether! Click on the green "request 1 ether from the faucet" button again and wait a few seconds. Don't worry, the faucet should have plenty of ether and will give you more if you ask.
 
-Paralysis Problem::
-  A common powerful approach to key management for cryptocurrencies is multisig transactions, referred to more generally as secret sharing.
-  But, what would happen if one of the shared keys was lost? The result would be a complete loss of all of the funds. +
-  This isn’t the only bad scenario. It’s also possible that the key-share holders have different ideas about how the money should be spent, and can’t come to an agreement. +
-  We use the term _Paralysis Problem_ to denote any of these awkward situations.
+Once you have a balance of 2 ETH, you can try again. This time, when you click on the orange "1 ether" donation button, you have sufficient balance to complete the transaction. Click "Submit" when MetaMask pops-up the payment window. After all of this, you should see a balance of 0.999937 ETH because you sent 1 ETH to the faucet with 0.000063 ETH in gas.
 
-Paralysis Proof System::
-  Paralysis Proofs help address a pervasive key-management problem in cryptocurrencies. See *Paralysis Problem*. +
-  A Paralysis Proof System can tolerate system paralysis in settings where players fail to act in concert. +
-  A Paralysis Proof System can be realized relatively easily for Ethereum using a smart contract.
+[[explore_tx_history]]
+=== Exploring the transaction history of an address
 
-Parity::
-  One of the most prominent interoperable implementations of the Ethereum client software.
+By now you have become an expert in using MetaMask to send and receive test ether. Your wallet has received at least two payments and sent at least one. Let's see all these transactions, using the +ropsten.etherscan.io+ block explorer. You can either copy your wallet address and paste it into the block explorer's search box, or you can have MetaMask open the page for you. Next to your account icon in MetaMask, you will see a button showing three dots. Click on it to show a menu of account-related options:
 
-Proof-of-Stake::
-    Proof-of-Stake (PoS) is a method by which a cryptocurrency blockchain protocol aims to achieve distributed consensus. Proof-of-Stake asks users to prove ownership of a certain amount of cryptocurrency (their "stake" in the network) in order to be able to participate to the validation of transactions.
+[[metamask_account_context_menu]]
+.MetaMask Account Context Menu
+image::images/metamask_account_context_menu.png["MetaMask Account Context Menu"]
 
-Proof-of-Work::
-    A piece of data (the proof) that requires significant computation to find. In Ethereum, miners must find a numeric solution to the Ethash algorithm that meets a network-wide difficulty target.
+Select "View Account on Etherscan", to open a web page in the block explorer, showing your account's transaction history:
 
-Receipt::
-    Data returned by an Ethereum client to represent the result of a particular transaction, including a hash of the transaction, its block number, the amount of gas used and, in case of deployment of a Smart Contract, the address of the Contract.
+[[block_explorer_account_history]]
+.Address Transaction History on Etherscan
+image::images/block_explorer_account_history.png["Address Transaction History on Etherscan"]
 
-Reentrancy Attack::
-  This attack can be reproduced when the Attacker contract calls to a Victim contract function, let's call it victim.withdraw(), in manner that before the original call to that contract function ever finishes, it calls the victim.withdraw() method again which continues to recursively call itself.
-  This recursive call can be implemented from a fallback function of the Attacker contract.
-  The only trick that the attacker has to perform is to break that recursive call before running out of gas and so avoiding the stolen ether be reverted.
+Here you can see the entire transaction history of your Ethereum address. It shows all the transactions recorded on the Ropsten blockchain, where your address is the sender or recipient of the transaction. Click on a few of these transactions to see more details.
 
-[require-sentence]
-Require::
-    In Solidity, require(false) compiles to *0xfd* which is the *REVERT* opcode. The REVERT instruction provides a way to stop execution and revert state changes, without consuming all provided gas and with the ability to return a reason. +
-    The require function should be used to ensure valid conditions, such as inputs, or contract state variables are met, or to validate return values from calls to external contracts. +
-    Prior to the *Byzantium* network upgrade there were two practical ways to revert a transaction: running out of gas or executing an invalid instruction. Both of these options consumed all remaining gas. +
-    When you look up this opcode in the *Yellow Paper* prior to the *Byzantium* network upgrade, you can't find it and because there was no specification for that opcode, when the EVM reached it, it thrown an _invalid opcode error_. +
+You can explore the transaction history of any address. See if you can explore the transaction history of the Ropsten Test Faucet address (Hint: it is the "sender" address listed in the oldest payment to your address). You can see all the test ether sent from the faucet to you and to other addresses. Every transaction you see can lead you to more addresses and more transactions. Before long you will be lost in the maze of interconnected data. Public blockchains contain an enormous wealth of information, all of which can be explored programmatically, as we will see in the future examples.
 
-Revert::
-    Use revert() when you need to handle the same type of situations as <<require-sentence, require()>> but with more complex logic.
-    For instances, if your code have some nested if/else logic flow, you will find that it makes sense to use <<require-sentence, require()>> instead of require().
+[[intro_world_computer]]
+=== Introducing the world computer
 
-Reward::
-    An amount, in Ether (ETH), included in each new block as a reward by the network to the miner who found the Proof-of-Work solution.
+We've created a wallet and we've sent and received ether. So far, we've treated Ethereum as a cryptocurrency. But Ethereum is much, much more. In fact, the cryptocurrency function is subservient to Ethereum's function as a world computer; a decentralized smart contract platform. Ether is meant to be used to pay for running _smart contracts_, which are computer programs that run on an emulated computer called the _Ethereum Virtual Machine (EVM)_.
 
-Recursive Length Prefix (RLP)::
-    RLP is an encoding standard, designed by the Ethereum developers to encode and serialize objects (data structures) of arbitrary complexity and length.
+The EVM is a global singleton, meaning that it operates as if it was a global, single-instance computer, running everywhere. Each node on the Ethereum network runs a local copy of the EVM to validate contract execution, while the Ethereum blockchain records the changing _state_ of this world computer as it processes transactions and smart contracts.
 
-Satoshi Nakamoto::
-    Satoshi Nakamoto is the name used by the person or people who designed Bitcoin and created its original reference implementation, Bitcoin Core. As a part of the implementation, they also devised the first blockchain database. In the process they were the first to solve the double spending problem for digital currency. Their real identity remains unknown.
+[[EOA_contracts]]
+=== Externally Owned Accounts (EOAs) and contracts
 
-Singleton::
-////
-TODO: Add definition
-////
+The type of account we created in the MetaMask wallet is called an _Externally Owned Account (EOA)_. Externally owned accounts are those that have a private key, which controls access to funds or contracts. Now, you're probably guessing there is another type of account. The other type of account is a _contract_ account. A contract account is owned (and controlled) by the logic of a software program recorded on the Ethereum blockchain and executed by the EVM.
 
-Vitalik Buterin::
-    Vitalik Buterin is a Russian-Canadian programmer and writer primarily known as the co-founder of Ethereum and as the co-founder of Bitcoin Magazine.
+In the future, all Ethereum wallets might be running as Ethereum contracts, blurring the distinction between Externally Owned Accounts and contracts. But the important distinction that will always remain is this: Humans make decisions through EOA's while software make decisions through contracts.
 
-Gavin Wood::
-    Gavin Wood is a British programmer who is the co-founder and former CTO of Ethereum. In August 2014 he proposed Solidity, a contract-oriented programming language for writing smart contracts.
+Contracts have an address, just like EOAs (wallets). Contracts can send and receive ether, just like wallets. When a transaction destination is a contract address, it causes that contract to _run_ in the EVM, using the transaction as its input.
 
-Secret key (aka private key)::
-    The secret number that allows Ethereum users to prove ownership of an account or contracts, by producing a digital signature (see public key, address, ECDSA).
+In addition to ether, transactions can contain _data_ indicating which specific function in the contract to run and what parameters to pass to that function. In this way, transactions _call_ functions within contracts. Finally, contracts can generate transactions calling other contracts, building complex execution paths. One typical use of this is Contract A calling Contract B in order to maintain a shared state across users of Contract A.
 
-SHA::
-    The Secure Hash Algorithm or SHA is a family of cryptographic hash functions published by the National Institute of Standards and Technology (NIST).
+In the next few sections, we will write our first contract. We will then create, fund, and use that contract with our MetaMask wallet and test ether on the Ropsten test network.
 
-SELFDESTRUCT opcode::
-  Smart contracts will exist and be executable as long as the whole network exists. They will disappear from the blockchain if they were programmed to self destruct or performing that operation using delegatecall or callcode.
-  Once self-destruct operation is performed, the remaining Ether stored at the contract address is sent to another address and the storage and code is removed from the state.
-  Although this is the expected behavior, the pruning of self-destructed contracts may or may not be implemented by Ethereum clients.
-  SELFDESTRUCT was previously called SUICIDE, with EIP6, SUICIDE was renamed to SELFDESTRUCT.
+[[simple_contract_example]]
+=== A simple contract: a test ether faucet
 
-Serenity::
-  The fourth and final development stage of Ethereum. Serenity does not yet have a planned release date.
+Ethereum has many different high-level languages, all of which can be used to write a contract and produce EVM bytecode. You can read about many of the most prominent and interesting ones in <<high_level_languages>>. One high-level language is by far the dominant language for smart contract programming: Solidity. Solidity was created by Gavin Wood, the co-author of this book and has become the most widely used language in Ethereum and beyond. We'll use Solidity to write our first contract.
 
-Serpent::
-	A procedural (imperative) programming language with syntax similar to Python. Can also be used to write functional (declarative) code, though it is not entirely free of side effects. Used sparsely. First created by Vitalik Buterin.
+For our first example, we will write a contract that controls a _faucet_. We've already used a faucet to get test ether on the Ropsten test network. A faucet is a relatively simple thing: it gives out ether to any address that asks and can be refilled periodically. You can implement a faucet as a wallet controlled by a human (or a web server), but we will write a Solidity contract that implements a faucet:
 
-////
-TODO: Can be improved
-////
+[[solidity_faucet_example]]
+.Faucet.sol : A Solidity contract implementing a faucet
+[source,solidity,linenums]
+----
+include::code/Faucet.sol[]
+----
 
-Smart Contract::
-  A program which executes on the Ethereum's computing infrastructure.
+Download +Faucet.sol+ from:
+https://github.com/ethereumbook/ethereumbook/blob/first_edition/code/Faucet.sol
 
-Solidity::
-	A procedural (imperative) programming language with syntax that is similar to JavaScript, C++ or Java. The most popular and most frequently used language for Ethereum smart contracts. First created by Gavin Wood (co-author of this book).
+This is a very simple contract, about as simple as we can make it. It is also a *flawed* contract, demonstrating a number of bad practices and security vulnerabilities. We will learn by examining all of its flaws in later sections. But for now, let's look at what this contract does and how it works, line by line.
 
-Solidity inline assembly::
-   Inline assembly is contained code within Solidity that use EVM Assembly, which can be seen as the human-readable form of EVM-code. Inline assembly tries to facilitate inherent difficulty and other issues arising when writing manual assembly.
+The first line is a comment:
 
-Spurious Dragon::
-  A hard fork at block #2,675,00 to address more denial of service attack vectors, and another state clearing. Also, a replay attack protection mechanism.
+[[comment]]
+----
+// Version of Solidity compiler this program was written for
+----
 
-Swarm::
-  A decentralised (P2P) storage network. It is used along with Web3 and Whisper to build DApps.
+Comments are for humans to read and are not included in the executable EVM bytecode. We usually put them on the line before the code we are trying to explain, or sometimes on the same line. Comments start with two forward slashes +//+. Everything from the slashes and beyond, until the end of that line, is treated the same as a blank line and ignored.
 
-Tangerine Whistle::
-  A hard fork at block #2,463,00 to change the gas calculation for certain IO-heavy operations and to clear the accumulated state from a denial of service attack, which exploited the low gas cost of those operations.
+Ok, the next lines are where our _actual_ contract starts:
 
-Testnet::
-  A test network (testnet for short) is used to simulate the behavior of the main Ethereum network.
+[[contract_definition]]
+----
+contract Faucet {
+----
 
-Transaction::
-  Data committed to the Ethereum Blockchain signed by an originating account, targeting a specific address. The transaction contains metadata such as the gas limit for the transaction.
+This line declares a contract object, similar to a +class+ declaration in other object-oriented languages like JavaScript, Java or Cpass:[++]. The contract definition includes all the lines between the curly braces pass:[{}] which define a +scope+, much like how curly braces are used in many other programming languages.
 
-Truffle::
-  One of the most commonly used Ethereum Development Frameworks. It is composed of several NodeJS packages and can be installed using Node Package Manager (NPM).
+Next, we declare the first function of the Faucet contract:
 
-////
+[[withdraw_function]]
+----
+function withdraw(uint withdraw_amount) public {
+----
 
-TODO: Provide a crisp definition
+The function is named +withdraw+, which takes one unsigned-integer (+uint+) argument named +withdraw_amount+. It is declared as a +public+ function, meaning it can be called by other contracts. The function definition follows between curly braces:
 
-////
-Turing Complete::
-  In computability theory, a system of data-manipulation rules (such as a computer's instruction set, a programming language, or a cellular automaton) is said to be Turing complete or computationally universal if it can be used to simulate any Turing machine. The concept is named after English mathematician and computer scientist Alan Turing.
+[[withdraw_limit]]
+----
+require(withdraw_amount <= 100000000000000000);
+----
 
-Vyper::
-  A high-level programming language, similar to Serpent with Python-like syntax. Intended to get closer to a pure-functional language. First created by Vitalik Buterin.
+The first part of the +withdraw+ function sets a limit on withdrawals. It uses the built-in Solidity function +require+ to test a precondition, that the +withdraw_amount+ is less than or equal to 100000000000000000 +wei+, which is the base unit of ether (see <<ether_denominations>>) and equivalent to 0.1 ether. If the +withdraw+ function is called with a +withdraw_amount+ greater than that amount, the +require+ function here will cause contract execution to stop and fail with an _exception_.
 
-Wallet::
-    Software that holds all your secret keys. Used as the interface to access and control your Ethereum accounts and interact with Smart Contracts. Notice that keys need not be stored in your wallet and can be retrieved from an offline storage (e.g. USB flash drive or paper) for improved security. Despite the name, wallets never store the actual coins or tokens.
+This part of the contract is the main logic of our faucet. It controls the flow of funds out of the contract by placing a limit on withdrawals. It's a very simple control but can give you a glimpse of the power of a programmable blockchain: decentralized software controlling money.
 
-Web3::
-  The third version of the web. First proposed by Gavin Wood, Web3 represents a new vision and focus for web applications: from centrally owned and managed applications, to applications built on decentralized protocols.
+[[withdraw_command]]
+Next comes the actual withdrawal:
+----
+msg.sender.transfer(withdraw_amount);
+----
 
-Wei::
-  The smallest denomination of ether. 10^18^ wei = 1 ether.
+A couple of interesting things are happening here. The +msg+ object is one of the inputs that all contracts can access. It represents the transaction that triggered the execution of this contract. The attribute +sender+ is the sender address of the transaction. The function +transfer+ is a built-in function that transfers ether from the contract to the address it is called from. Reading it backward, this means +transfer+ to the +sender+ of the +msg+ that triggered this contract execution. The +transfer+ function takes an amount as its only argument. We pass the +withdraw_amount+ value that was the parameter to the +withdraw+ function declared a few lines above.
 
-Whisper::
-  A decentralised (P2P) messaging service. It is used along with Web3 and Swarm to build DApps.
+The very next line is the closing curly brace, indicating the end of the definition of our +withdraw+ function.
 
-Zero address::
-  A special Ethereum address, with all 20-bytes as zeros, that is specified as a destination address in the "contract creation transaction".
+Below we declare one more function:
+
+[[fallback_function]]
+----
+function () public payable {}
+----
+
+This function is a so-called _"fallback"_ or _default_ function, which is called if the transaction that triggered the contract didn't name any of the declared functions in the contract, or any function at all, or didn't contain data. Contracts can have one such default function (without a name) and it is usually the one that receives ether. That's why it is defined as a +public+ and +payable+ function, which means it can accept ether into the contract. It doesn't do anything, other than accept the ether, as indicated by the empty definition in the curly brackets pass:[{}]. If we make a transaction that sends ether to the contract address, as if it were a wallet, this function will handle it.
+
+Right below our default function is the final closing curly bracket, which closes the definition of the contract +Faucet+. That's it!
+
+[[compile_faucet_contract]]
+=== Compiling the faucet contract
+
+Now that we have our first example contract, we need to use a Solidity compiler to convert the Solidity code into EVM bytecode, so it can be executed by the EVM.
+
+The Solidity compiler comes as a standalone executable, as part of different frameworks, and also bundled in an _Integrated Development Environment (IDE)_. To keep things simple, we will use one of the more popular IDEs, called Remix.
+
+Use your Chrome browser (with the MetaMask wallet we installed earlier) to navigate to the Remix IDE at:
+
+https://remix.ethereum.org/
+
+When you first load Remix, it will start with a sample contract caller +ballot.sol+. We don't need that, so let's close it, clicking on the +x+ on the corner of the tab:
+
+[[remix_close_tab]]
+.Close the default example tab
+image::images/remix_close_tab.png["Close the default example tab"]
+
+Now, add a new tab by clicking on the circular-plus-sign in the left toolbar, naming the new file +Faucet.sol+:
+
+[[remix_toolbar]]
+.Click the plus sign to open a new tab
+image::images/remix_toolbar.png["Click the plus sign to open a new tab"]
+
+Once you have a new tab open, copy and paste the code from our example +Faucet.sol+:
+
+[[remix_faucet_load]]
+.Copy the Faucet example code into the new tab
+image::images/remix_faucet_load.png["Copy the Faucet example code into the new tab"]
+
+Now we have loaded the +Faucet.sol+ contract into the Remix IDE, the IDE will automatically compile the code. If all goes well, you will see a green box with "Faucet" in it appear on the right, under the Compile tab, confirming the successful compilation:
+
+[[remix_compile]]
+.Remix successfully compiles the Faucet.sol contract
+image::images/remix_compile.png[""]
+
+If something goes wrong, the most likely problem is that Remix IDE is using a version of the Solidity compiler that is different from +0.4.19+. In that case, our pragma directive will prevent +Faucet.sol+ from compiling. To change the compiler version, go to the "Settings" tab, set the compiler version to +0.4.19+, and try again.
+
+The Solidity compiler has now compiled our +Faucet.sol+ into EVM bytecode. If you are curious, the bytecode looks like this:
+
+[[faucet_bytecode]]
+----
+PUSH1 0x60 PUSH1 0x40 MSTORE CALLVALUE ISZERO PUSH2 0xF JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH1 0xE5 DUP1 PUSH2 0x1D PUSH1 0x0 CODECOPY PUSH1 0x0 RETURN STOP PUSH1 0x60 PUSH1 0x40 MSTORE PUSH1 0x4 CALLDATASIZE LT PUSH1 0x3F JUMPI PUSH1 0x0 CALLDATALOAD PUSH29 0x100000000000000000000000000000000000000000000000000000000 SWAP1 DIV PUSH4 0xFFFFFFFF AND DUP1 PUSH4 0x2E1A7D4D EQ PUSH1 0x41 JUMPI JUMPDEST STOP JUMPDEST CALLVALUE ISZERO PUSH1 0x4B JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH1 0x5F PUSH1 0x4 DUP1 DUP1 CALLDATALOAD SWAP1 PUSH1 0x20 ADD SWAP1 SWAP2 SWAP1 POP POP PUSH1 0x61 JUMP JUMPDEST STOP JUMPDEST PUSH8 0x16345785D8A0000 DUP2 GT ISZERO ISZERO ISZERO PUSH1 0x77 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST CALLER PUSH20 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF AND PUSH2 0x8FC DUP3 SWAP1 DUP2 ISZERO MUL SWAP1 PUSH1 0x40 MLOAD PUSH1 0x0 PUSH1 0x40 MLOAD DUP1 DUP4 SUB DUP2 DUP6 DUP9 DUP9 CALL SWAP4 POP POP POP POP ISZERO ISZERO PUSH1 0xB6 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP JUMP STOP LOG1 PUSH6 0x627A7A723058 KECCAK256 PUSH9 0x13D1EA839A4438EF75 GASLIMIT CALLVALUE LOG4 0x5f PUSH24 0x7541F409787592C988A079407FB28B4AD000290000000000
+----
+
+Aren't you glad you are using a high-level language like Solidity instead of programming directly in EVM bytecode? Me too!
+
+[[create_contract]]
+=== Creating the contract on the blockchain
+
+So we have a contract. We've compiled it into bytecode. Now, we need to "register" the contract on the Ethereum blockchain. We will be using the Ropsten testnet to test our contract, so that's the blockchain we want to record it on.
+
+Registering a contract on the blockchain involves creating a special transaction, whose destination is the address 0x0000000000000000000000000000000000000000, also known as the _zero address_. The zero address is a special address that tells the Ethereum blockchain that you want to register a contract. Fortunately, Remix IDE will handle all of that for you and send the transaction to MetaMask.
+
+First, switch to the "Run" tab and select "Injected Web3" in the "Environment" drop-down selection box. This connects Remix IDE to the MetaMask wallet, and through MetaMask to the Ropsten Test Network. Once you do that, you can see "Ropsten" under Environment. Also, in the Account selection box it shows the address of your wallet:
+
+[[remix_run.png]]
+.Remix IDE "Run" tab, with "Injected Web3" environment selected
+image::images/remix_run.png["Remix IDE Run tab, with Injected Web3 environment selected"]
+
+Right below the "Run" settings we just confirmed, is the Faucet contract, ready to be created. Click on the "Create" button:
+
+[[remix_create_contract]]
+.Click the Create button in the Run tab
+image::images/remix_create_contract.png["Click the Create button in the Run tab"]
+
+Remix IDE will construct the special "creation" transaction and MetaMask will ask you to approve it. As you can see from MetaMask, the contract creation transaction has no ether in it, but it has 258 bytes (the compiled contract) and will consume 10 Gwei in gas. Click "Submit" to approve it:
+
+[[remix_metamask_create]]
+.MetaMask showing the contract creation transaction
+image::images/remix_metamask_create.png["MetaMask showing the contract creation transaction"]
+
+Now, wait: It will take about 15 to 30 seconds for the contract to be mined on Ropsten. Remix IDE won't appear to be doing much, be patient.
+
+Once the contract is created, it appears at the bottom of the Run tab:
+
+[[remix_contract_interact]]
+.The Faucet contract is ALIVE!
+image::images/remix_contract_interact.png["The Faucet contract is ALIVE!"]
+
+Notice that the Faucet contract now has an address of its own: Remix shows it as +Faucet at 0x72e....c7829+. The small clipboard symbol to the right allows you to copy the contract address into your clipboard. We will use that in the next section.
+
+[[interact_contract]]
+=== Interacting with the contract
+
+Let's recap what we've learned so far: Ethereum contracts are programs that control money, which run inside a virtual machine called the EVM. They are created by a special transaction that submits their bytecode to be recorded on the blockchain. Once they are created on the blockchain, they have an Ethereum address, just like wallets. Anytime someone sends a transaction to a contract address it causes the contract to run in the EVM, with the transaction as its input. Transactions sent to contract addresses may have ether or data or both in them. If they contain ether, it is "deposited" to the contract balance. If they contain data, the data can specify a named function in the contract and call it, passing arguments to the function.
+
+[[view_contract_address]]
+==== Viewing the contract address in a block explorer
+
+Now, we have a contract recorded on the blockchain and we can see it has an Ethereum address. Let's check it out on the +ropsten.etherscan.io+ block explorer and see what a contract looks like. Copy the address of the contract by clicking on the clipboard icon next to its name:
+
+[[remix_contract_address]]
+.Copy the contract address from Remix
+image::images/remix_contract_address.png["Copy the contract address from Remix"]
+
+Keep Remix open in a tab, we'll come back to it again later. Now, navigate your browser to +ropsten.etherscan.io+ and paste the address into the search box. You should see the contract's Ethereum address history:
+
+[[etherscan_contract_address]]
+.View the Faucet contract address in the etherscan block explorer
+image::images/etherscan_contract_address.png["View the Faucet contract address in the etherscan block explorer"]
+
+[[fund_contract]]
+==== Funding the contract
+
+For now, the contract only has one transaction in its history: the contract creation transaction. As you can see, the contract also has no ether (zero balance). That's because we didn't send any ether to the contract in the creation transaction, even though we could have.
+
+Let's send some ether to the contract! You should still have the address of the contract in your clipboard (if not, copy it again from Remix). Open MetaMask, and send 1 ether to it, exactly as you would any other Ethereum address:
+
+[[metamask_send_to_contract]]
+.Send 1 ether to the contract address
+image::images/metamask_send_to_contract.png[""]
+
+In a minute, if you reload the etherscan block explorer, it will show another transaction to the contract address and an updated balance of 1 ether.
+
+Remember the unnamed default public payable function in our +Faucet.sol+ code? It looked like this:
+
+[[fallback_function_review]]
+----
+function () public payable {}
+----
+
+When you sent a transaction to the contract address, with no data specifying which function to call, it called this default function. Because we declared it as a +payable+, it accepted and deposited the 1 ether into the contract account balance. Your transaction caused the contract to run in the EVM, updating its balance. We have funded our faucet!
+
+[[withdraw_from_contract]]
+==== Withdrawing from our contract
+
+Next, let's withdraw some funds from the faucet. To withdraw, we have to construct a transaction that calls the +withdraw+ function and passes a +withdraw_amount+ argument to it. To keep things simple for now, Remix will construct that transaction for us and MetaMask will present it for our approval.
+
+Return to the Remix tab and look at the contract under the "Run" tab. You should see a red box labeled +withdraw+ with a field entry labeled +uint256 withdraw_amount+ :
+
+[[remix_contract_interact]]
+.The withdraw function of Faucet.sol, in Remix
+image::images/remix_contract_interact.png["The withdraw function of Faucet.sol, in Remix"]
+
+This is the Remix interface to the contract. It allows us to construct transactions that call the functions defined in the contract. We will enter a +withdraw_amount+ and click the +withdraw+ button to generate the transaction.
+
+First, let's figure out the +withdraw_amount+. We want to try and withdraw 0.1 ether, which is the maximum amount allowed by our contract. Remember that all currency values in Ethereum are denominated in +wei+ internally, and our +withdraw+ function expects the +withdraw_amount+ to be denominated in +wei+ too. The amount we want is 0.1 ether, which is +100000000000000000 wei+ (1 followed by 17 zeros).
+
+
+
+[TIP]
+====
+Due to a limitation in JavaScript, a number as large as 10^17 cannot be processed by Remix. Instead, we enclose it in double quotes, to allow Remix to receive it as a string and manipulate it as a +BigNumber+. If we don't enclose it in quotes, the Remix IDE will fail to process it and display "Error encoding arguments: Error: Assertion failed"
+====
+
+Type "100000000000000000" (with the quotes) into the +withdraw_amount+ box and click on the +withdraw+ button:
+
+[[remix_withdraw]]
+.Click "withdraw" in Remix to create a withdrawal transaction
+image::images/remix_withdraw.png[""]
+
+MetaMask will pop-up a transaction window for you to approve. Click "Submit" to send your withdrawal call to the contract:
+
+[[metamask_withdraw]]
+.MetaMask transaction to call the withdraw function
+image::images/metamask_withdraw.png["MetaMask transaction to call the withdraw function"]
+
+Wait a minute and then reload the +etherscan+ block explorer to see the transaction reflected in the Faucet contract address history:
+
+[[etherscan_withdrawal_tx]]
+.Etherscan shows the transaction calling the withdraw function
+image::images/etherscan_withdrawal_tx.png["Etherscan shows the transaction calling the withdraw function"]
+
+
+We now see a new transaction with the contract address as the destination and zero ether. The contract balance has changed and is now 0.9 ether because it sent us 0.1 ether as requested. But we don't see an "OUT" transaction in the contract address history.
+
+Where's the outgoing withdrawal? A new tab has appeared in the contract's address history page, named "Internal Transactions". Because the 0.1 ether transfer originated from the contract code, it is an internal transaction (also called a _message_). Click on the "Internal Transactions" tab to see it:
+
+
+[[etherscan_withdrawal_internal]]
+.Etherscan shows the internal transaction transferring ether out from the contract
+image::images/etherscan_withdrawal_internal.png["Etherscan shows the internal transaction transferring ether out from the contract"]
+
+This "internal transaction" was sent by the contract in this line of code (from the +withdraw+ function in +Faucet.sol+):
+
+[[withdraw_command_review]]
+----
+msg.sender.transfer(withdraw_amount);
+----
+
+To recap: We sent a transaction from our MetaMask wallet that contained data instructions to call the +withdraw+ function with a +withdraw_amount+ argument of 0.1 ether. That transaction caused the contract to run inside the EVM. As the EVM ran the Faucet contract's +withdraw+ function, first it called the +require+ function and validated that our amount was less than or equal to the maximum allowed withdrawal of 0.1 ether. Then it called the +transfer+ function to send us the ether. Running the +transfer+ function generated an internal transaction that deposited 0.1 ether into our wallet address, from the contract's balance. That's the one shown in the "Internal Transactions" tab in +etherscan+.
+
+[[intro_conclusion]]
+=== Conclusion
+
+In this chapter, we've set up a wallet using MetaMask and we've funded it using a faucet on the Ropsten Test Network. We received ether into our wallet's Ethereum address. Then we sent ether to the faucet's Ethereum address.
+
+Next, we wrote a faucet contract in Solidity. We used the Remix IDE to compile the contract into EVM bytecode. We used Remix to form a transaction and recorded the faucet contract on the Ropsten blockchain. Once recorded, the faucet contract had an Ethereum address and we sent it some ether. Finally, we constructed a transaction to call the +withdraw+ function and successfully asked for 0.1 ether. The contract checked our request and sent us 0.1 ether with an internal transaction.
+
+It may not seem like much, but we've just successfully interacted with software that controls money on a decentralized world computer.
+
+We will do a lot more smart contract programming in <<smart contracts>> and learn about best practices and security considerations.
