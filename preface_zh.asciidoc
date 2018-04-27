@@ -1,0 +1,228 @@
+[preface]
+[[preface_chap]]
+== 前言
+
+////
+TODO：添加段落
+////
+
+[[writing_mastering_ethereum_sec]]
+=== 写作掌握以太坊
+
+////
+TODO：添加段落
+////
+
+[[intended_audience_sec]]
+=== 目标受众
+
+////
+TODO：添加段落
+////
+
+[[why_bees_sec]]
+=== 为什么封面上有蜜蜂？
+
+西方蜜蜂（Apis mellifera）是一种表现出高度复杂行为的物种，最终使蜂巢受益。每个蜜蜂按照一套简单的规则自由运作，并通过“跳舞”来传达重要的发现。这个舞蹈带有宝贵的信息，比如太阳的位置和从蜂房到目标的相对地理坐标。通过解释这种舞蹈，蜜蜂可以传达这些信息或采取行动，从而实现“蜂巢思维式”的意志。
+
+尽管蜜蜂形成了一个等级社会，并且有蜂后哺育后代，但没有中央政府或蜂王的领导者。成千上万的成员群体展现的高度智能和复杂的行为是来自社交网络中个体交互的天然特性。
+
+大自然表明，去中心的系统可以具有弹性，并且可以产生天然的复杂性和令人难以置信的老练，而不需要中央权威、层级或复杂的部分。
+
+[[conventinons_used_sec]]
+=== 本书中使用的约定
+
+((("typographical conventions")))本书使用以下印刷约定：
+
+_Italic_:: 表示新的术语、URL、电子邮件地址、文件名和文件扩展名。
+
++Constant width+:: 用于程序清单以及段落内用于引用程序元素，如变量或函数名称、数据库、数据类型、环境变量、语句和关键字。
+
+**`Constant width bold`**:: 显示应由用户直接输入的命令或其他文本。
+
+_++Constant width italic++_:: 显示应由用户提供的值或由上下文确定的值替换。
+
+
+[TIP]
+====
+此图标表示小提示或建议。
+====
+
+[NOTE]
+====
+此图标表示一般性笔记。
+====
+
+[WARNING]
+====
+此图标表示警告或警告。
+====
+
+[[code_examples_sec]]
+=== 代码示例
+
+((("code examples, obtaining and using", id="codeuse00")))这些示例在Solidity、JavaScript和Python中进行了说明，并且使用类Unix操作系统的命令行。所有代码片段都可以在主资源库的https://github.com/ethereumbook/ethereumbook/tree/first_edition/code[_code_] 子目录中的GitHub存储库中找到。分叉图书代码，尝试代码示例，或通过GitHub提交更正：
+
+https://github.com/ethereumbook/ethereumbook/tree/first_edition/
+
+所有代码片段都可以在大多数操作系统上进行复制，只需安装相应语言的编译器、解释器和库即可。必要时，我们提供基本安装说明和这些说明输出的逐步示例。
+
+部分代码片段和代码输出已重新格式化以便打印。在所有这些情况下，被反斜线 (\) 字符分隔的行，后面跟着一个换行符。在转录这些示例时，请删除这两个字符并再次合并这些行，您应该看到与示例相同的结果。
+
+所有代码片段都尽可能使用实际值和计算结果，以便您可以从示例到示例进行构建，并在您编写的代码中看到相同的结果。例如，私钥和相应的公钥和地址都是真实的。样本交易、合约、区块和区块链参考已全部在实际以太坊区块链中引入，并且是公共账本的一部分，因此您可以在任何以太坊系统上查看它们。
+
+[[using_code_examples_sec]]
+=== 使用代码示例
+
+这本书是为了帮助你完成工作。一般来说，如果本书提供了示例代码，则可以在您的程序和文档中使用它。除非您复制大部分代码，否则您无需联系我们获得许可。例如，编写使用本书中几个代码块的程序不需要许可。销售或分发O'Reilly书籍中的示例CD-ROM需要获得许可。通过引用本书并引用示例代码来回答问题并不需要许可。将本书中的大量示例代码整合到产品文档中需要获得许可。
+
+((("attribution")))我们赞赏，但不要求属性。属性通常包括标题、作者、出版商和ISBN。例如：“_Mastering Ethereum_ by Andreas M. Antonopoulos (O’Reilly). Copyright 2018 Andreas M. Antonopoulos LLC,
+978-1-491-97194-9.“。
+
+((("open source licenses")))本书的某些版本是在开源许可下提供的，如https://creativecommons.org/licenses/by-nc/4.0/[CC-BY-NC] ，在这种情况下，该许可证的条款适用。
+
+如果您觉得您对代码示例的使用不属于合理使用或上述许可，请随时与我们联系：[<a href="mailto:permissions@oreilly.com">permissions@oreilly.com</a>]。
+
+[[ethereum_sddresses_and_transactions_sec]]
+=== 以太坊地址和本书中的交易
+
+((("getting started", "warnings and cautions")))((("warnings and cautions", "avoid sending money to addresses appearing in book")))((("keys and addresses", "warnings and cautions")))((("transactions", "warnings and cautions")))((("blockchain applications", "warnings and cautions")))((("QR codes", "warnings and cautions")))本书中使用的以太坊地址、交易、密钥、QR码和区块链数据在很大程度上都是真实的。这意味着您可以浏览区块链，查看作为示例提供的交易，使用您自己的脚本或程序等检索它们。
+
+但是，请注意，用于构造地址的私钥要么打印在本书中，要么已被“销毁”。这意味着，如果您向这些地址中的任何一个发送资金，资金将永远丢失，或者在某些情况下，每个可以阅读本书的人都可以使用书中打印的私钥取得资金。
+
+[WARNING]
+====
+请勿将资金发送至本书中的任何地址。您的资金将被另一位读者占用，或永远丢失。((("", startref="codeuse00")))
+====
+
+[[oreilly_safari_sec]]
+=== O'Reilly safari
+
+[role =“safarienabled”]
+[NOTE]
+====
+通过：[<a href="http://oreilly.com/safari" class="orm:hideurl"><em class="hyperlink">Safari</em></a>] （原名Safari Books Online）是一个面向企业、政府、教育工作者和个人的基于会员的培训和参考平台。
+====
+
+会员可以访问包括O'Reilly Media、哈佛商业评论、Prentice Hall专业人员、Addison-Wesley专业人员、Microsoft Press、Sams、Que等在内的250多家出版商的数千本图书、培训视频、学习路径、互动式教程和策划播放列表、Peachpit Press、Adobe、Focal Press、Cisco Press、John Wiley＆Sons、Syngress、Morgan Kaufmann、IBM红皮书、Packt、Adobe Press、FT Press、Apress、Manning、New Riders、McGraw-Hill、Jones＆Bartlett和Course技术等等。
+
+欲了解更多信息，请访问pass:[<a href="http://oreilly.com/safari" class="orm:hideurl"><em>http://oreilly.com/safari</em></a>] 。
+
+[[how_to_contact_us_sec]]
+=== 如何与我们联系
+
+((("comments and questions")))((("contact information")))请向发布者提出有关本书的评论和问题：
+
+++++
+<ul class="simplelist">
+  <li>O’Reilly Media, Inc.</li>
+  <li>1005 Gravenstein Highway North</li>
+  <li>Sebastopol, CA 95472</li>
+  <li>800-998-9938 (in the United States or Canada)</li>
+  <li>707-829-0515 (international or local)</li>
+  <li>707-829-0104 (fax)</li>
+</ul>
+++++
+
+要评论或提出有关本书的技术问题，请发送电子邮件以传递：[<a class="email" href="mailto:bookquestions@oreilly.com"> <em> bookquestions@oreilly.com </ em> </ a >]。
+
+有关我们的书籍，课程，会议和新闻的更多信息，请参阅我们的网站链接：$$ http：//www.oreilly.com$$ []。
+
+在Facebook上找到我们: link:$$http://facebook.com/oreilly$$[]
+
+在Twitter上关注我们: link:$$http://twitter.com/oreillymedia$$[]
+
+在YouTube上观看我们的链接: link:$$http://www.youtube.com/oreillymedia$$[]
+
+[[contacting_the_authour_sec]]
+=== 联系作者
+
+您可以在我的个人网站上与我联系，Andreas M. Antonopoulos：
+link:$$https://antonopoulos.com/$$[]
+
+有关“掌握以太坊”以及开放版和翻译的信息可在以下网址获得：
+link:$$https://ethereumbook.info/$$[]
+
+在Facebook上关注我：
+link:$$https://facebook.com/AndreasMAntonopoulos$$[]
+
+在推特上关注我：
+link:$$https://twitter.com/aantonop$$[]
+
+在LinkedIn上关注我：
+link:$$https://linkedin.com/company/aantonop$$[]
+
+非常感谢所有通过每月捐款支持我工作的赞助人。你可以在这里关注我的Patreon页面：
+link:$$https://patreon.com/aantonop$$[]
+
+[[acknowledgments_sec]]
+=== 致谢
+
+我爱我的母亲特蕾莎的话语和书籍，他把我养在一栋房子里，每间墙壁都有书。尽管母亲是自称为科技人员，但我的母亲在1982年也给我买了第一台电脑。我的父亲，Menelaos是一位土木工程师，他刚刚在80岁时出版了他的第一本书，他教我逻辑思维和分析思维，热爱科学和工程。
+
+谢谢大家在这个旅程中支持我。
+
+[[github_contrib]]
+==== 早期发布草稿（GitHub贡献）
+
+许多贡献者对GitHub上的早期版本草案提出了评论，更正和补充。谢谢大家对本书的贡献。
+
+以下是按照字母顺序排序的着名GitHub贡献者列表，其中包括他们的GitHub ID括号内：
+
+* Abhishek Shandilya (abhishandy)
+* Adam Zaremba (zaremba)
+* Anthony Lusardi (pyskell)
+* Assaf Yossifoff (assafy)
+* Ben Kaufman (ben-kaufman)
+* Bryant Eisenbach (fubuloubu)
+* Chanan Sack (chanan-sack)
+* Christopher Gondek (christophergondek)
+* Cornell Blockchain (CornellBlockchain)
+  - Alex Frolov (sashafrolov)
+  - Brian Guo (BrianGuo)
+  - Brian Leffew (bleffew99)
+  - Giancarlo Pacenza (GPacenza)
+  - Lucas Switzer (LucasSwitz)
+  - Ohad Koronyo (ohadh123)
+  - Richard Sun (richardsfc)
+* Dan Shields (NukeManDan)
+* Daniel McClure (danielmcclure)
+* Dennis Zasnicoff (zasnicoff)
+* Diego H. Gurpegui (diegogurpegui)
+* Dimitris Tsapakidis (dimitris-t)
+* Franco Daniel Berdun (fMercury)
+* Hudson Jameson (Souptacular)
+* Ivan Molto (ivanmolto)
+* Jason Hill (denifednu)
+* Javier Rojas (fjrojasgarcia)
+* Joel Gugger (guggerjoel)
+* Jonathan Velando (rigzba21)
+* Jon Ramvi (ramvi)
+* Kevin Carter (kcar1)
+* Krzysztof Nowak (krzysztof)
+* Luke Schoen (ltfschoen)
+* Liang Ma (liangma)
+* Martin Berger (drmartinberger)
+* Matthew Sedaghatfar (sedaghatfar)
+* Mike Pumphrey (bmmpxf)
+* Mobin Hosseini (iNDicat0r)
+* Nagesh Subrahmanyam (chainhead)
+* Nichanan Kesonpat (nichanank)
+* Pierre-Jean Subervie (pjsub)
+* Pong Cheecharern (Pongch)
+* Qiao Wang (qiaowang26)
+* Raul Andres Garcia (manilabay)
+* Roger Häusermann (haurog)
+* Solomon Victorino (bitsol)
+* Steve Klise (sklise)
+* Sylvain Tissier (SylTi)
+* Tim Nugent (timnugent)
+* Timothy McCallum (tpmccallum)
+* Tomoya Ishizaki (zaq1tomo)
+* Vignesh Karthikeyan (meshugah)
+* Will Binns (wbnns)
+* Xavier Lavayssière (xalava)
+* Yash Bhutwala (yashbhutwala)
+* Yeramin Santana (ysfdev)
+* Zhen Wang (zmxv)
+* ztz (zt2)
