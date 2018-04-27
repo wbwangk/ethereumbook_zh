@@ -242,7 +242,7 @@ uint256 result = uint256(signed_value) / base_unit;
 [4] https://bitcointalk.org/index.php?topic=301538.0 +
 [5] http://hackingdistributed.com/2017/06/15/town-crier/ +
 [6] https://www.cs.cornell.edu/~fanz/files/pubs/tc-ccs16-final.pdf +
-[7] https://github.com/Azure/azure-blockchain-projects/blob/master/bletchley/EnterpriseSmartContracts.md
+[7] https://github.com/Azure/azure-blockchain-projects/blob/master/bletchley/EnterpriseSmartContracts.md +
 [8] https://people.cs.uchicago.edu/~teutsch/papers/truebit.pdf +
 [9] https://link.smartcontract.com/whitepaper +
 [10] http://people.cs.uchicago.edu/~teutsch/papers/decentralized_oracles.pdf +
