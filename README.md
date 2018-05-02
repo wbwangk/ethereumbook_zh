@@ -1,64 +1,67 @@
-![Mastering Ethereum Cover](images/cover_thumb.png)
-
-[![Gitter](https://github.com/ethereumbook/ethereumbook/blob/develop/images/chat-on-gitter.svg)](https://gitter.im/ethereumbook/Lobby)
-
+![Mastering Ethereum Cover](images/cover_thumb.png)____________________**Watch a video tutorial on how to contribute ---->**[![Ethereum Book Pull Request Tutorial](https://img.youtube.com/vi/IBYHohWm_5w/1.jpg)](https://www.youtube.com/watch?v=IBYHohWm_5w)
 <hr/>
 
-# Mastering Ethereum
+聊天: [![Gitter](https://github.com/ethereumbook/ethereumbook/blob/develop/images/chat-on-gitter.svg)](https://gitter.im/ethereumbook/Lobby)
 
-Mastering Ethereum is a book for developers, offering a guide to the operation and use of the Ethereum, Ethereum Classic, RootStock (RSK) and other compatible EVM-based open blockchains.
+项目管理: [![Waffle.io - Columns and their card count](https://badge.waffle.io/ethereumbook/ethereumbook.svg?columns=all)](https://waffle.io/ethereumbook/ethereumbook)
+<hr/>
 
-This repository contains the draft of the book, currently in progress, scheduled for publication in Q4'2018 by O'Reilly Media. The publication date has been delayed, unfortunately, due to some personal issues. Expect to see content developed and pushed here in Q1 and Q2 2018.
+# 掌握以太坊(Mastering Ethereum)
 
-# Contents
+掌握以太坊是一本面向开发者的书，提供了以太坊、以太坊经典、RootStock(RSK)和其他兼容的基于EVM的开放区块链的操作和使用指南。
 
-The current status of the book is "outline". Chapters are not clearly defined or organized yet. Snippets and outlines of various topics are being developed and comments are very welcome!
+该存储库包含该书的草稿，该书目前正在编写中，计划通过O'Dilly Media在Q4' 2018出版。遗憾的是，由于一些个人问题，发布日期已经推迟。期待看到内容在2018年第一季度和第二季度推出。
 
-Note: the order or structure of these snippets is in constant flux.
+# 内容
 
-Here's what is available now:
+这本书的现状是“草稿”。有些章节是完整的，有些则是部分章节。各种主题的片段正在开发中，并且非常欢迎评论！
 
-| Section | Progress | Content Complete | Review Complete |
+注意：这些片段的顺序或结构是不断变化的。
+
+以下是现在可用的内容：
+
+| 章节 | 进展 | 内容完成 | 检查完成 |
 |-------|------|:------:|:------:|
-| [Preface](preface.asciidoc) | ### |||
-| [Glossary](glossary.asciidoc) | ### |||
-| [What is Ethereum](what-is.asciidoc) | ### |||
-| [Introduction](intro.asciidoc) | ############# |||
-| [Ethereum Clients](clients.asciidoc) | ###### |||
-| [Ethereum Testnets](ethereum-testnets.asciidoc) | # |||
-| [Keys and Addresses](keys-addresses.asciidoc) | ############# | :heavy_check_mark: ||
-| [Wallets](wallets.asciidoc) | ########### | :heavy_check_mark: ||
-| [Transactions](transactions.asciidoc) | ## |||
-| [Smart Contracts](smart-contracts.asciidoc) | ## |||
-| [Tokens](tokens.asciidoc) | ################## | :heavy_check_mark: ||
-| [Accounting & Gas](gas.asciidoc) | # |||
-| [EVM](evm.asciidoc) | # |||
-| [Consensus](consensus.asciidoc) | # |||
-| [DevP2P Protocol](devp2p-protocol.asciidoc) | ## |||
-| [Dev Tools and Frameworks](dev-tools.asciidoc) | ##### |||
-| [Dapps](dapps.asciidoc) | # |||
-| [Ethereum Standards (EIPs/ERCs)](standards-eip-erc.asciidoc) | ## |||
+| [前言](preface.asciidoc) | #### |||
+| [词汇表](glossary.asciidoc) | ######## |||
+| [什么是以太坊](what-is.asciidoc) | ######### | :heavy_check_mark: ||
+| [介绍](intro.asciidoc) | ############# | :heavy_check_mark: ||
+| [以太坊客户端](clients.asciidoc) | ########## |||
+| [以太坊测试](ethereum-testnets.asciidoc) | #### |||
+| [密钥和地址](keys-addresses.asciidoc) | ############# | :heavy_check_mark: ||
+| [清白](wallets.asciidoc) | ########### | :heavy_check_mark: ||
+| [交易](transactions.asciidoc) | ############### | :heavy_check_mark: ||
+| [智能合约](smart-contracts.asciidoc) | #################### |||
+| 开发工具和框架](dev-tools.asciidoc) | ###### |||
+| [Tokens](tokens.asciidoc) | ################### | :heavy_check_mark: ||
+| [DApps](dapps.asciidoc) | ### |||
+| [Oracles](oracles.asciidoc) | ####### |||
+| [账号和燃料](gas.asciidoc) | #### |||
+| [EVM](evm.asciidoc) | ####### |||
+| [共识](consensus.asciidoc) | ##### |||
+| [Vyper](vyper.asciidoc) | ##### |||
+| [DevP2P协议](devp2p-protocol.asciidoc) | ### |||
+| [以太坊标准(EIPs/ERCs)](standards-eip-erc.asciidoc) | #### |||
 
 
-Jump in! Review, comment, suggest and contribute...
+跳进去！审查、评论、建议和贡献......
 
-# Contributing, reviewing and commenting
+# 贡献、审查和评论
 
-This book is developed collaboratively and openly, here on Github. We accept comments, contributions and corrections from all.
+本书是在Github上进行协作和公开开发的。我们接受来自所有人的评论，贡献和更正。
 
-To chat with the authors and editors:
-
+与作者和编辑聊天：
 
 [![Gitter](https://github.com/ethereumbook/ethereumbook/blob/develop/images/chat-on-gitter.svg)](https://gitter.im/ethereumbook/Lobby)
 
-To contribute, see the detailed [Contributing Guide](CONTRIBUTE.md).
+To contribute, see the detailed [Contributing Guide](CONTRIBUTING.md).
 
-# Source & License
+# 源码和许可
 
-The book's source code, found in this repository, is kept synchronized with the print and ebook editions.
+本书的源代码在本存储库中保持与打印和电子书版本保持同步。
 
-The [develop branch](https://github.com/ethereumbook/ethereumbook/tree/develop), containing the most recent changes you see here is the in-progress drafting of Mastering Ethereum.
+[开发分支](https://github.com/ethereumbook/ethereumbook/tree/develop), 包含您在此处看到的最新更改是掌握以太坊正在进行的草稿.
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Mastering Ethereum</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://antonopoulos.com/" property="cc:attributionName" rel="cc:attributionURL">The Ethereum Book LLC and Gavin Wood</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">掌握以太坊</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://antonopoulos.com/" property="cc:attributionName" rel="cc:attributionURL">The Ethereum Book LLC and Gavin Wood</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
 
-It is expected that the book will be released under a more permissive CC-BY-SA license within a year of publication.
+预计本书将在一年内发布，并以更宽松的CC-BY-SA许可证发布。
