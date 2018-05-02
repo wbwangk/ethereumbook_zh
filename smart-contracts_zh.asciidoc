@@ -306,11 +306,13 @@ library:: 一个库合约是一种只能部署一次并被其他合约使用的�
 
 函数使用以下语法定义：
 
+----
 *function*{nbsp}FunctionName([_parameters_])
 {*public*|*private*|*internal*|*external*}
 [*pure*|*constant*|*view*|*payable*]
 pass:[[]_modifiers_]
 [*returns*{nbsp}(pass:[<]_return types_pass:[>])]
+----
 
 我们来看看这些组件中的每一个：
 
