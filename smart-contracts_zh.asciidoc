@@ -675,48 +675,48 @@ contract Token is mortal {
 
 正如 <<solidity_address_object>>  中提到的， +delegatecall+ 不同于 +call+ ，因为 +msg+ 上下文不会改变。例如， +call+ 将 +msg.sender+ 的值更改为调用合约，而 +delegatecall+ 保持与调用合约中的 +msg.sender+ 相同。基本上， +delegatecall+ 在当前合约的上下文中运行另一个合约的代码。它最常用于从 +库+ 中调用代码。
 
-应该谨慎使用 +delegatecall+ 调用。它可能会有一些意想不到的效果，特别是如果你调用的合约不是作为库设计的。
+应该谨慎使用 +delegatecall+ 调用。它可能会有一些意想不到的效果，特别是如果你调用的合约不是作为库设计的时候。
 
 ==== 事件
 
-事件是便利生产交易日志的Solidity构造。当一个交易完成（成功与否）时，它会产生一个_transaction receipt_，就像我们在 <<evm>>  中看到的那样。交易收据包含_log_条目，用于提供有关在执行交易期间发生的操作的信息。事件是用于构造这些日志的Solidity高级对象。
+事件是方便产生交易日志的Solidity构造。当一个交易完成（成功与否）时，它会产生一个 _交易收据(transaction receipt)_ ，就像我们在 <<evm>>  中看到的那样。交易收据包含 _log_ 条目，用于提供有关在执行交易期间发生的操作的信息。事件是用于构造这些日志的Solidity高级对象。
 
-事件在轻量级客户端和DApps中特别有用，它可以“监视”特定事件并将其报告给用户界面，或对应用程序的状态进行更改以反映基础合约中的事件。
+事件在轻量级客户端和DApp中特别有用，它可以“监视”特定事件并将其报告给用户界面，或对应用程序的状态进行更改以反映下层合约中的事件。
 
 事件对象将参数序列化并记录在区块链中的交易日志中。你可以在参数之前提供关键字 +indexed+ ，使得索引表（哈希表）的值可以由应用程序搜索或过滤。
 
-到目前为止，我们还没有在我们的+龙头+示例中添加任何事件，所以让我们来做。我们将添加两个事件，一个记录任何提款，一个记录任何存款。我们将分别称这些事件+撤回+和+存款+。首先，我们在+水龙头+合约中定义事件：
+到目前为止，我们还没有在我们的 +Faucet+ 示例中添加任何事件，所以让我们来做。我们将添加两个事件，一个记录提款，一个记录存款。我们将分别称这些事件为 +Withdrawal（提款）+ 和 +Deposit（存款）+ 。首先，我们在 +Faucet+ 合约中定义事件：
 
 ----
-合约水龙头是凡人{
-	事件撤销（地址索引，单位数量）
-	活动存款（地址索引，uint金额）
+contract Faucet is mortal {
+	event Withdrawal(address indexed to, uint amount)
+	event Deposit(address indexed from, uint amount)
 
 	[...]
 }
 ----
 
-我们选择将地址+索引为+，以允许在任何构建的用户界面中搜索和过滤以访问我们的+水龙头+。
+我们选择将地址 +indexed+ ，以允许为了访问我们的 +Faucet+ 而构建的用户界面中进行搜索和过滤。
 
 接下来，我们使用 +emit+ 关键字将事件数据合并到交易日志中：
 
 ----
-//给任何人提供以太的问题
-函数提取（uint withdraw_amount）public {
+// Give out ether to anyone who asks
+function withdraw(uint withdraw_amount) public {
     [...]
-    msg.sender.transfer（withdraw_amount）;
-    发出提取（msg.sender，withdraw_amount）;
+    msg.sender.transfer(withdraw_amount);
+    emit Withdrawal(msg.sender, withdraw_amount);
 }
-//接受任何收到的金额
-function（）public payable {
-    发出存款（msg.sender，msg.value）;
+// Accept any incoming amount
+function () public payable {
+    emit Deposit(msg.sender, msg.value);
 }
 ----
 
 
 ==== 组织你的代码
 
-首先，让我们看看一些文体规则，这些规则将帮助你编写一致且易于阅读的Solidity程序。这里有一个Solidity的风格指南：
+首先，让我们看看一些格式上的规则，这些规则将帮助你编写一致且易于阅读的Solidity程序。这里有一个Solidity的风格指南：
 
 https://solidity.readthedocs.io/en/develop/style-guide.html
 
@@ -724,107 +724,107 @@ https://solidity.readthedocs.io/en/develop/style-guide.html
 [[best_practices_sec]]
 === 最佳实践
 
-在智能合约创建过程中需要考虑的两个最重要的概念是* gas *和* security *。
+在智能合约创建过程中需要考虑的两个最重要的概念是 *燃料* 和 *安全* 。
 
 [[gas_sec]]
-==== 气
+==== 燃料(Gas)
 
-* Gas​​ *在“gas”部分有更详细的描述，但在智能合约编程中是一个非常重要的考虑因素。燃料是决定用户分配给交易的计算能力的资源。如果在计算过程中超过了气体限制，则会发生以下一系列事件：
+*燃料* 在 <<gas>> 部分有更详细的描述，但它在智能合约编程中是一个非常重要的考虑因素。燃料是一个指定用户分配给交易的计算能力的资源。如果在计算过程中超过了燃料限制，则会发生以下一系列事件：
 
-*抛出异常
-*函数执行前的合约状态被恢复
-*全部燃料作为交易手续费交给矿工，不予退还*
+* 抛出一个异常
+* 函数执行前的合约状态被恢复
+* 全部燃料作为交易手续费交给矿工， *不予* 退还
 
-由于燃料由创建该交易的用户支付，因此不鼓励用户调用燃料成本高的功能。因此，程序员最大限度地减少合约职能的燃料成本。为此，在构建智能合约时建议采用某些做法，以尽量减少函数调用周围的燃料成本。
+由于燃料由创建该交易的用户支付，因此不鼓励用户调用燃料成本高的函数。因此，程序员乐于最大限度地减少合约函数的燃料成本。为此，在构造智能合约时建议采用某些做法，以尽量减少围绕函数调用的燃料成本。
 
 *避免动态大小的数组*
 
-*通过动态调整大小的数组的任何循环，其中函数对每个元素执行操作或搜索特定元素都有气体溢出的风险。在找到所需结果之前，或在对每个元素采取行动之前，合约可能会用尽气体。
+* 通过动态调整大小的数组的任何循环，在函数中对每个元素执行操作或搜索特定元素，都有燃料超额的风险。在找到所需结果之前，或执行对每个元素的操作之前，合约可能会耗尽燃料。
 
 *如何估算合约方法的燃料？*
 
-如果你需要估计执行某种合约方法所需的气体（考虑其调用参数），则可以使用例如以下程序;
+如果你需要估计执行某种合约方法所需的燃料（考虑其调用参数），则可以使用例如以下程序;
 
-[源码，JavaScript]
-var contract = web3.eth.contract（abi）.at（address）;
-var gasEstimate = contract.myAweSomeMethod.estimateGas（arg1，arg2，{from：account}）;
+[source, JavaScript]
+var contract = web3.eth.contract(abi).at(address);
+var gasEstimate = contract.myAweSomeMethod.estimateGas(arg1, arg2, {from: account});
 
-* gasEstimate *会告诉我们执行所需的气体单位数量。
+*gasEstimate* 会告诉我们执行所需的燃料单位数量。
 
-要从网络获取*燃料价格*，你可以使用;
+要从网络获取 *燃料价格* ，你可以使用;
 
-[源码，JavaScript]
-var gasPrice = web3.eth.getGasPrice（）;
+[source, JavaScript]
+var gasPrice = web3.eth.getGasPrice();
 
-从那里，估计*燃料成本*;
+从那里，估算 *燃料成本* ;
 
-[源码，JavaScript]
-var gasCostInEther = web3.fromWei（（gasEstimate * gasPrice），'ether'）;
+[source, JavaScript]
+var gasCostInEther = web3.fromWei((gasEstimate * gasPrice), 'ether');
 
-在*松露*这可以实现如下，
+在 *Truffle* 这可以实现如下，
 
-[源码，JavaScript]
+[source, JavaScript]
 ....
-var METokenContract = artifacts.require（“./ METoken.sol”）;
+var METokenContract = artifacts.require("./METoken.sol");
 
-METokenContract.web3.eth.getGasPrice（function（error，result）{
-    var gasPrice =数字（结果）;
-    console.log（“Gas Price is” +gasPrice+ “wei”）; //“10000000000000”
+METokenContract.web3.eth.getGasPrice(function(error, result) {
+    var gasPrice = Number(result);
+    console.log("Gas Price is " + gasPrice + " wei"); // "10000000000000"
 
-    //获取合约实例
-    METokenContract.deployed（）。然后（函数（METokenokenTractInstance）{
+    // Get the contract instance
+    METokenContract.deployed().then(function(METokenContractInstance) {
 
-        //在函数名称后面使用关键字'estimateGas'来获得这个特定函数的气体估计（aprove）
-        返回METokenContractInstance.aprove.estimateGas（_address，100）;
+        // Use the keyword 'estimateGas' after the function name to get the gas estimation for this particular function (aprove)
+        return METokenContractInstance.aprove.estimateGas(_address, 100);
 
-    }）。then（function（result）{
-        var gas = Number（result）;
+    }).then(function(result) {
+        var gas = Number(result);
 
-        console.log（“gas estimate =” +gas+ “units”）;
-        console.log（“gas cost estimation =”+（gas * gasPrice）+“wei”）;
-        console.log（“gas cost estimation =” +METokenContract.web3.fromWei（（gas * gasPrice），'ether'）+“ether”）;
-    }）;
-}）;
+        console.log("gas estimation = " + gas + " units");
+        console.log("gas cost estimation = " + (gas * gasPrice) + " wei");
+        console.log("gas cost estimation = " + METokenContract.web3.fromWei((gas * gasPrice), 'ether') + " ether");
+    });
+});
 ....
 
 其中可能有类似的输出;
 
 ....
-燃料价格是20000000000威
-瓦斯估计= 26794单位
-燃料成本估算= 535880000000000 wei
-燃料成本估算= 0.00053588乙醚
+Gas Price is 20000000000 wei
+gas estimation = 26794 units
+gas cost estimation = 535880000000000 wei
+gas cost estimation = 0.00053588 ether
 ....
 
 [[security_sec]]
 ==== 安全
 
-随着区块链处于早期阶段，*安全*是编写智能合约时最重要的考虑因素之一。与其他程序一样，智能合约将执行完全写入的内容，这并不总是等同于程序员的意图。为此，程序员必须了解常见的安全漏洞和适当的方法来防范这些漏洞。以下列出了一些过去出现的安全问题。
+在区块链的早期阶段， *安全* 是编写智能合约时最重要的考虑因素之一。与其他程序一样，智能合约将精确执行写入的内容，这并不总是等同于程序员的意图。为此，程序员必须了解常见的安全漏洞和适当的方法来防范这些漏洞。以下列出了一些过去出现的安全问题。
 
 *重入*
 
-重入是编程中的一种现象，在该编程中，函数或程序被中断，然后在先前调用完成之前再次调用。在智能合约编程的情况下，当合约A调用合约B中的一个函数时，可能会发生重新合并，合约B又调用合约A中的相同函数，导致递归执行。在合约状态在关键性呼叫结束后才更新的情况下，这可能是特别危险的。
+重入是编程中的一种现象，在该编程中，函数或程序被中断，然后在先前调用完成之前再次被调用。在智能合约编程的情况下，当合约A调用合约B中的一个函数，合约B又调用合约A中的相同函数时，可能会发生重入，导致递归执行。在合约状态在关键性调用结束后才更新的情况下，这可能是特别危险的。
 
-为了理解这一点，设想一个用户拨打银行合约的提款。用户A调用银行B中的撤销功能，该功能执行以下操作：
+为了理解这一点，设想一个调用银行合约的用户提款。用户A调用银行B中的提款(withdraw)函数，该函数执行以下操作：
 
-//“用户A”建议使用EOA账户，但在此示例中它是合约。
+//“用户A”字面上是一个EOA账户，但在此示例中它是一个合约。
 
-。检查A是否有可用余额
-。拨打A的默认功能，在乙太银行支付A
-。更新用户A在合约中的余额
+. 检查A是否有可用余额
+. 调用A的默认函数，用以太币支付A
+. 在合约中更新用户A的余额
 
-作为附注，在支付期间调用A的默认功能的原因是合约B允许A在该支付期间执行代码。例如，如果合约A保留了它所支付的资金数量，则可能需要更改名为“余额”的变量，将“余额”设置为与之前的金额相等，再加上刚刚支付的金额。
+附注，在支付期间调用A的默认函数的原因是合约B允许A在该支付期间执行代码。例如，如果合约A保留了它所支付的资金数量，则可能需要更改名为“余额”的变量，将“余额”设置为与之前的金额相等，再加上刚刚支付的金额。
 
-但是，恶意攻击者可以利用这种执行。想象一下，在A的默认功能中，用户A再次调用银行B的退出功能。B将首先检查A是否有可用余额，但由于步骤3（其更新A的余额）尚未执行，所以对于B银行来说，用户A仍然有可用资金撤回，无论此次数多少次函数被重新调用。因此，只要有可用于执行的气体，就可以调用“撤回”。
+但是，恶意攻击者可以利用这种执行。想象一下，在A的默认函数中，用户A再次调用银行B的提款(withdraw)函数。B将首先检查A是否有可用余额，但由于步骤3（其更新A的余额）尚未执行，所以对于B银行来说，用户A仍然有可用资金提款，无论此次数多少次函数被重新调用。因此，只要有可用于执行的燃料，就可以一直调用“提款(withdraw)”。
 
-这个漏洞因其在DAO攻击中的相关性而特别出名。用户利用了这样一个事实，即在呼叫转移资金并撤回价值数百万美元的乙醚后，合约中的余额发生了变化。
+这个漏洞因其关联到DAO攻击而特别出名。用户A利用了这样一个事实，即在调用转移资金并提款价值数百万美元的以太币后，合约中的余额发生了变化。
 
-为了防止重新入侵，http://solidity.readthedocs.io/en/v0.4.21/security-considerations.html[Solidity]建议程序员遵守Checks-Effects-Interactions模式，其中a函数调用（如减少余额）发生在拨打电话之前。在我们的例子中，这意味着切换步骤3和2：在付出之前更新用户的余额。在以太坊，这是完全没问题的，因为交易的所有影响都是原子的，这意味着在没有用户支付的情况下更新余额是不可能的。要么都发生，要么抛出异常，也不会发生。这防止了重新入侵攻击，因为所有后续调用原始合约都会遇到正确的修改状态。
+为了防止重入，http://solidity.readthedocs.io/en/v0.4.21/security-considerations.html[Solidity] 建议程序员遵守Checks-Effects-Interactions模式，即让函数调用（如减少余额）的生效发生在调用之前。在我们的例子中，这意味着切换步骤3和2：在付款之前更新用户的余额。在以太坊，这是完全没问题的，因为交易的所有影响都是原子性的，这意味着在没有用户支付的情况下更新余额是不可能的。要么都发生，要么抛出异常，也不会发生。这防止了重入攻击，因为所有对原始合约的后续调用都会遇到正确的修改状态。
 
-*委托调用*::  // todo
+*委托调用*:: //todo
 
 ////
-TODO：添加委托呼叫部分^
+TODO：添加委托调用部分^
 ////
 
 [[development_style_sec]]
@@ -837,221 +837,215 @@ TODO：添加段落
 [[design_patterns_sec]]
 ==== 设计模式
 
-任何编程范例的软件开发人员通常都会遇到以行为，结构，交互和创建为主题的重复设计挑战。通常这些问题可以概括
-并重新应用于未来类似性质的问题。当给定正式结构时，这些概括称为*设计模式*。
+任何编程范例的软件开发人员通常都会遇到以行为、结构、交互和创建为主题的重复设计挑战。通常这些问题可以概括和重新应用于未来类似性质的问题。当给定一个正式结构时，这些概括称为 *设计模式* 。
 智能合约有自己的一系列重复出现的设计问题，可以使用下面描述的一些模式来解决。
 
-在智能合约的发展中存在着无数的设计问题，因此无法讨论所有这些问题
-这里。因此，本节将重点讨论智能合约设计中最常见的三类问题分类：*访问控制*，*国家流量*和*资金支出*。
+在智能合约的发展中存在着无数的设计问题，这里无法讨论所有这些问题。因此，本节将重点讨论智能合约设计中最常见的三类问题： *访问控制* ， *状态流* 和 *资金支付* 。
 
-在本节中，我们将制定一份合约，最终将包含所有这三种设计模式。该合约将运行一个投票系统
-允许用户对“真相”进行投票。该合约将提出一项索赔，例如“小熊队赢得世界系列赛”。或者“纽约市正在下雨”，然后用户会有
-有机会选择真或假。如果大多数参与者投票赞成真实，并且同样如果多数投票，合约将认为该提议是真实的
-的参与者投了赞成票。为了激励真实性，每次投票必须向合约传送100张以上的唱片，而失败少数派出的资金将分成几份
-大多数。大多数参与者将从少数人中获得他们的部分奖金以及他们的初始投资。
+在本节中，我们将制定一份合约，最终将包含所有这三种设计模式。该合约将运行一个投票系统，允许用户对“真相”进行投票。该合约将提出一项断言，例如“小熊队赢得世界系列赛”，或者“纽约市正在下雨”，然后用户会有机会投票选择真或假。如果大多数参与者投票赞成真，则合约将认为该提议是真实的，同样如果多数投票假，则提议结论是假。为了激励诚实，每次投票必须先向合约转账100以太币，没收少数派的资金奖励给多数派。每个多数派的参与者将分享少数派的投票资金。
 
-这个“真相投票”系统实际上是Gnosis的基础，Gnosis是一个建立在以太坊之上的预测工具。有关Gnosis的更多信息，请访问：https：//gnosis.pm/
+这个“真相投票”系统实际上是Gnosis的基础，Gnosis是一个建立在以太坊之上的预测工具。有关Gnosis的更多信息，请访问：https://gnosis.pm/
 
 [[access_control_sec]]
 ===== 访问控制
 
-访问控制限制哪些用户可以调用合约功能。例如，真相投票合约的所有者可能决定限制那些可以参与投票的人。
+访问控制限制哪些用户可以调用合约函数。例如，真相投票合约的所有者可能决定限制哪些人可以参与投票。
 为了达到这个目标，合约必须施加两个访问限制：
 
-。只有合约的所有者可以将新用户添加到“允许的选民”列表中
-。只有允许的选民可以投票
+. 只有合约的所有者可以添加新用户到“允许的选民”列表
+. 只有允许的选民可以投票
 
-Solidity功能修饰符提供了一个简洁的方式来实现这些限制。
+Solidity函数修饰符提供了一个简洁的方式来实现这些限制。
 
 _注意：以下示例在修改器主体内使用下划线分号。这是一个Solidity功能，用于告知编译器何时运行修改过的函数的主体。开发人员可以像修改过的函数的主体将被复制到下划线的位置那样操作._
-[源，坚固]
+
+[source,solidity]
 ----
-杂注扎实性0.4.21;
+pragma solidity ^0.4.21;
 
-合约TruthVote {
+contract TruthVote {
 
-    地址public owner = msg.sender;
+    address public owner = msg.sender;
 
-    地址[] true_votes;
-    地址[] false_votes;
-    映射（地址=>布尔）选民;
-    映射（地址=>布尔）hasVoted;
+    address[] true_votes;
+    address[] false_votes;
+    mapping (address => bool) voters;
+    mapping (address => bool) hasVoted;
 
     uint VOTE_COST = 100;
 
-    修饰符onlyOwner（）{
-        require（msg.sender == owner）;
+    modifier onlyOwner() {
+        require(msg.sender == owner);
         _;
     }
 
-    修饰符onlyVoter（）{
-        要求（选民[msg.sender]！= false）;
+    modifier onlyVoter() {
+        require(voters[msg.sender] != false);
         _;
     }
 
-    修饰符hasNotVoted（）{
-        require（hasVoted [msg.sender] == false）;
+    modifier hasNotVoted() {
+        require(hasVoted[msg.sender] == false);
         _;
     }
 
-    函数addVoter（地址选举器）
-        上市
-        onlyOwner（）
+    function addVoter(address voter)
+        public
+        onlyOwner()
     {
-        选民[voter] =真;
+        voters[voter] = true;
     }
 
-    函数投票（bool val）
-        上市
-        应付
-        onlyVoter（）
-        hasNotVoted（）
+    function vote(bool val)
+        public
+        payable
+        onlyVoter()
+        hasNotVoted()
     {
-        if（msg.value> = VOTE_COST）{
-            if（val）{
-                true_votes.push（msg.sender）;
+        if (msg.value >= VOTE_COST) {
+            if (val) {
+                true_votes.push(msg.sender);
             } else {
-                false_votes.push（msg.sender）;
+                false_votes.push(msg.sender);
             }
-            hasVoted [msg.sender] = true;
+            hasVoted[msg.sender] = true;
         }
     }
 }
 ----
 *修饰符和函数的说明：*
 
- -  * onlyOwner *：这个修饰符可以修饰一个函数，使得函数只能被发送者调用，地址与* owner *匹配。
- -  * onlyVoter *：这个修饰符可以修饰一个函数，使得函数只能被注册选举人调用。
- -  * addVoter（选民）*：此功能用于将选民添加到选民列表。该功能使用* onlyOwner *修饰符，因此只有该合约的所有者可以调用它。
- -  * vote（val）*：这个函数被投票者用来对所提出的命题投下真或假。它用* onlyVoter *修饰符装饰，所以只有已登记的选民可以打电话给它。
+- *onlyOwner*: 这个修饰符可以修饰一个函数，使得函数只能被地址与 *owner* 匹配的发送者调用。
+- *onlyVoter*: 这个修饰符可以修饰一个函数，使得函数只能被注册的选民调用。
+- *addVoter(voter)*: 此函数用于将选民添加到选民列表。该函数使用 *onlyOwner* 修饰符，因此只有该合约的所有者可以调用它。
+ -  *vote(val)*：这个函数被投票者用来对提议投下真或假。它用 *onlyVoter* 修饰符装饰，所以只有已注册的选民可以调用它。
 
 [[state_flow_sec]]
 ===== 状态流
 
-许多合约将需要一些操作状态的概念。合约的状态将决定合约的行为方式以及它提供的操作
-在给定的时间点。让我们回到我们的真实投票系统来获得更具体的例子。
+许多合约将需要一些操作状态的意图。在一个给定时间点，合约的状态将决定合约的行为方式以及它提供的操作。让我们回到我们的真相投票系统来获得更具体的例子。
 
-我们投票系统的运作可以分为三个不同的州。
+我们投票系统的运作可以分为三个不同的状态。
 
-。*注册*：服务已创建，所有者现在可以添加选民。
-。*投票*：所有选民投票。
-。*以太坊*：投票付款被分开并发送给大多数参与者。
+. *Register*: 服务已创建，所有者现在可以添加选民。
+. *Vote*: 所有选民投票。
+. *Disperse*: 投票付款被切分并发送给多数派参与者。
 
 以下代码继续建立在访问控制代码的基础上，但进一步将功能限制在特定状态。
 在Solidity中，使用枚举值来表示状态是司空见惯的事情。
 
-[源，坚固]
+[source,solidity]
 ----
-杂注扎实性0.4.21;
+pragma solidity ^0.4.21;
 
-合约TruthVote {
-    枚举状态{
-        寄存器，
-        投票，
-        以太坊
+contract TruthVote {
+    enum States {
+        REGISTER,
+        VOTE,
+        DISPERSE
     }
 
-    地址public owner = msg.sender;
+    address public owner = msg.sender;
 
     uint voteCost;
 
-    地址[] trueVotes;
-    地址[] falseVotes;
+    address[] trueVotes;
+    address[] falseVotes;
 
 
-    映射（地址=>布尔）选民;
-    映射（地址=>布尔）hasVoted;
+    mapping (address => bool) voters;
+    mapping (address => bool) hasVoted;
 
     uint VOTE_COST = 100;
 
-    州政府;
+    States state;
 
-    修饰符onlyOwner（）{
-        require（msg.sender == owner）;
+    modifier onlyOwner() {
+        require(msg.sender == owner);
         _;
     }
 
-    修饰符onlyVoter（）{
-        要求（选民[msg.sender]！= false）;
+    modifier onlyVoter() {
+        require(voters[msg.sender] != false);
         _;
     }
 
-    修饰符isCurrentState（States _stage）{
-        require（state == _stage）;
+    modifier isCurrentState(States _stage) {
+        require(state == _stage);
         _;
     }
 
-    修饰符hasNotVoted（）{
-        require（hasVoted [msg.sender] == false）;
+    modifier hasNotVoted() {
+        require(hasVoted[msg.sender] == false);
         _;
     }
 
-    函数startVote（）
-        上市
-        onlyOwner（）
-        isCurrentState（States.REGISTER）
+    function startVote()
+        public
+        onlyOwner()
+        isCurrentState(States.REGISTER)
     {
-        goToNextState（）;
+        goToNextState();
     }
 
-    函数goToNextState（）内部{
-        state = States（uint（state） +1）;
+    function goToNextState() internal {
+        state = States(uint(state) + 1);
     }
 
-    修饰语pretransition（）{
-        goToNextState（）;
+    modifier pretransition() {
+        goToNextState();
         _;
     }
 
-    函数addVoter（地址选举器）
-        上市
-        onlyOwner（）
-        isCurrentState（States.REGISTER）
+    function addVoter(address voter)
+        public
+        onlyOwner()
+        isCurrentState(States.REGISTER)
     {
-        选民[voter] =真;
+        voters[voter] = true;
     }
 
-    函数投票（bool val）
-        上市
-        应付
-        isCurrentState（States.VOTE）
-        onlyVoter（）
-        hasNotVoted（）
+    function vote(bool val)
+        public
+        payable
+        isCurrentState(States.VOTE)
+        onlyVoter()
+        hasNotVoted()
     {
-        if（msg.value> = VOTE_COST）{
-            if（val）{
-                trueVotes.push（msg.sender）;
+        if (msg.value >= VOTE_COST) {
+            if (val) {
+                trueVotes.push(msg.sender);
             } else {
-                falseVotes.push（msg.sender）;
+                falseVotes.push(msg.sender);
             }
-            hasVoted [msg.sender] = true;
+            hasVoted[msg.sender] = true;
         }
     }
 
-    功能以太坊（bool val）
-        上市
-        onlyOwner（）
-        isCurrentState（States.VOTE）
-        转变前的（）
+    function disperse(bool val)
+        public
+        onlyOwner()
+        isCurrentState(States.VOTE)
+        pretransition()
     {
-        地址[]内存胜出组;
-        uint胜利补偿;
-        if（trueVotes.length> falseVotes.length）{
+        address[] memory winningGroup;
+        uint winningCompensation;
+        if (trueVotes.length > falseVotes.length) {
             winningGroup = trueVotes;
-            winningCompensation = VOTE_COST+ （VOTE_COST * falseVotes.length）/ trueVotes.length;
-        } else if（trueVotes.length <falseVotes.length）{
+            winningCompensation = VOTE_COST + (VOTE_COST*falseVotes.length) / trueVotes.length;
+        } else if (trueVotes.length < falseVotes.length) {
             winningGroup = falseVotes;
-            winningCompensation = VOTE_COST+ （VOTE_COST * trueVotes.length）/ falseVotes.length;
+            winningCompensation = VOTE_COST + (VOTE_COST*trueVotes.length) / falseVotes.length;
         } else {
             winningGroup = trueVotes;
             winningCompensation = VOTE_COST;
-            for（uint i = 0; i <falseVotes.length; i+ +）{
-                falseVotes [I] .transfer（winningCompensation）;
+            for (uint i = 0; i < falseVotes.length; i++) {
+                falseVotes[i].transfer(winningCompensation);
             }
         }
 
-        for（uint j = 0; j <winningGroup.length; j+ +）{
-            winningGroup [j]的.transfer（winningCompensation）;
+        for (uint j = 0; j < winningGroup.length; j++) {
+            winningGroup[j].transfer(winningCompensation);
         }
     }
 }
@@ -1059,88 +1053,86 @@ _注意：以下示例在修改器主体内使用下划线分号。这是一个S
 
 *修饰符和函数的说明：*
 
- -  * isCurrentState *：在继续执行装饰函数之前，此修饰符将要求合约处于指定状态。
- -  * pretransition *：在执行装饰函数的其余部分之前，此修饰符将转换到下一个状态
- -  * goToNextState *：将合约转换到下一个状态的功能
- -  *以太坊*：计算多数并相应地以太坊奖金的功能。只有主人可以调用这个函数来正式结束投票。
- -  * startVote *：所有者可用于开始投票的功能。
+- *isCurrentState*: 在继续执行被装饰的函数之前，此修饰符将要求合约处于指定状态。
+- *pretransition*: 在执行被装饰的函数的其余部分之前，此修饰符将转换到下一个状态
+- *goToNextState*: 将合约转换到下一个状态的函数
+- *disperse*: 计算多数派并分配相应奖金的函数。只有所有者可以调用这个函数来正式结束投票。
+- *startVote*: 所有者可用于启动投票的函数。
 
-注意到允许所有者关闭投票流程可能会很重要，因为这会打开本合约，直至滥用。在更真实的实现中，投票期应在公众理解的时间段后结束。为了这个例子，这很好。
+重要的是要注意，允许所有者关闭投票过程将使该合同成为滥用。在更真实的实现中，投票期应在公众理解的时间段后结束。对于这个例子，这很好。
 
-现在增加的内容确保只有在所有者决定开始投票期间时才允许投票，用户只能在投票前由业主注册，并且在投票结束后才能分配资金。
+现在增加的内容确保只有在所有者决定开始投票期间时才允许投票，用户只能在投票前由所有者注册，并且在投票结束后才能分配资金。
 
 [[withdraw_sec]]
-===== 撤回
+===== 提款(Withdraw)
 
-许多合约将为用户从中提取资金提供一些方法。在我们的工作示例中，大多数用户在合约时直接发送货款
-开始以太坊资金。虽然这看起来有效，但它是一种思想不足的解决方案。在* disperse *中* addr.send（）*调用的接收地址可以是一个合约
-具有故障回退功能，并因此破坏*以太坊*。这有效地阻止了所有更多的参与者接收他们的收入。
-更好的解决方案是提供一个用户可以打电话来收取收入的提款功能。
+许多合约为用户从合约中提取资金提供了一些方法。在我们的工作示例中，当合约开始分配资金时将钱直接发送给多数派用户。虽然这看起来有效，但它是一种思想不足的解决方案。在 *disperse* 中 *addr.send()* 调用的接收地址可以是一个合约，合约具有失败回退函数，并因此破坏 *disperse* 。这实际上阻止了更多的多数派参与者接收他们的收益。
+一个更好的解决方案是提供一个提款函数，用户可以调用它来接收收益。
 
-[源，坚固]
+[source,solidity]
 ----
 ...
 
-枚举状态{
-    寄存器，
-    投票，
-    确定，
-    收回
+enum States {
+    REGISTER,
+    VOTE,
+    DETERMINE,
+    WITHDRAW
 }
 
-映射（地址=>布尔）投票;
+mapping (address => bool) votes;
 uint trueCount;
 uint falseCount;
 
-布尔冠军;
-uint胜利补偿;
+bool winner;
+uint winningCompensation;
 
-修饰符posttransition（）{
+modifier posttransition() {
     _;
-    goToNextState（）;
+    goToNextState();
 }
 
-函数投票（bool val）
-    上市
-    onlyVoter（）
-    isCurrentStage（State.VOTE）
+function vote(bool val)
+    public
+    onlyVoter()
+    isCurrentStage(State.VOTE)
 {
-    if（votes [msg.sender] == address（0）&& msg.value> = VOTE_COST）{
-        票[msg.sender] = val;
-        if（val）{
-            trueCount+ +;
+    if (votes[msg.sender] == address(0) && msg.value >= VOTE_COST) {
+        votes[msg.sender] = val;
+        if (val) {
+            trueCount++;
         } else {
-            falseCount+ +;
+            falseCount++;
         }
     }
 }
 
-函数确定（bool val）
-    上市
-    onlyOwner（）
-    isCurrentState（State.VOTE）
-    转变前的（）
-    过渡期后的（）
+function determine(bool val)
+    public
+    onlyOwner()
+    isCurrentState(State.VOTE)
+    pretransition()
+    posttransition()
 {
-    if（trueCount> falseCount）{
-        赢家=真;
-        winningCompensation = VOTE_COST+ （VOTE_COST * false_votes.length）/ true_votes.length;
-    } else if（falseCount> trueCount）{
-        赢家=假;
-        winningCompensation = VOTE_COST+ （VOTE_COST * true_votes.length）/ false_votes.length;
+    if (trueCount > falseCount) {
+        winner = true;
+        winningCompensation = VOTE_COST + (VOTE_COST*false_votes.length) / true_votes.length;
+    } else if (falseCount > trueCount) {
+        winner = false;
+        winningCompensation = VOTE_COST + (VOTE_COST*true_votes.length) / false_votes.length;
     } else {
         winningCompensation = VOTE_COST;
     }
 }
 
-函数withdraw（）
-    上市
-    onlyVoter（）
-    isCurrentState（State.WITHDRAW）
+function withdraw()
+    public
+    onlyVoter()
+    isCurrentState(State.WITHDRAW)
 {
-    如果（票[msg.sender]！=地址（0））{
-        如果（票[msg.sender] ==赢家）{
-            msg.sender.transfer（winningCompensation）;
+    if (votes[msg.sender] != address(0)) {
+        if (votes[msg.sender] == winner) {
+            msg.sender.transfer(winningCompensation);
         }
     }
 }
@@ -1148,19 +1140,19 @@ uint胜利补偿;
 ...
 ----
 
-*修饰符和（更新）功能的说明：*
+*修饰符和（更新）函数的说明：*
 
- -  * posttransition *：函数调用后转换到下一个状态
- -  *确定*：此功能与以前的*以太坊*功能非常相似，除了现在只计算赢家和获胜赔偿，并且实际上并未发送任何资金。
- -  *投票*：投票现在被添加到投票映射和真/假计数器递增。
- -  *撤回*：允许选民收取奖金（如果有的话）。
+- *posttransition*: 函数调用后转换到下一个状态
+- *determine*: 此函数与以前的 *disperse* 函数非常相似，除了现在只计算赢家和获胜赔偿，并且实际上并未发送任何资金。
+- *vote*: 投票现在被添加到投票映射和真/假计数器递增。
+- *withdraw*: 允许选民收取奖金（如果有的话）。
 
 
 
-这样，如果发送失败，它只会在特定的来电者的情况下失败，并且不会妨碍所有其他用户收取他们的奖金的能力。
+这样，如果发送失败，它只会在特定的调用者的情况下失败，而不会妨碍其他用户收取他们的奖金的能力。
 
 [[modularity_and_side_effects_sec]]
-====模块化和副作用
+==== 模块化和副作用
 
 ////
 TODO：添加段落
@@ -1169,7 +1161,7 @@ TODO：添加段落
 [[contract_libraries_sec]]
 ==== 合约库
 
-Github链接：https：//github.com/ethpm
+Github链接：https://github.com/ethpm
 
 存储库链接：https://www.ethpm.com/registry
 
@@ -1180,67 +1172,67 @@ Github链接：https：//github.com/ethpm
 [[security_best_practices_sec]]
 ==== 安全最佳实践
 
-Github：https：//github.com/ConsenSys/smart-contract-best-practices/
+Github：https://github.com/ConsenSys/smart-contract-best-practices/
 
-文档：https：//consensys.github.io/smart-contract-best-practices/
+文档：https://consensys.github.io/smart-contract-best-practices/
 
-https://blog.zeppelin.solutions/onward-with-以太坊-smart-contract-security-97a827e47702
+https://blog.zeppelin.solutions/onward-with-ethereum-smart-contract-security-97a827e47702
 
-https://medium.com/zeppelin-blog/the-hitchhikers-guide-to-smart-contracts-in-以太坊-848f08001f05#.cox40d2ut
+https://medium.com/zeppelin-blog/the-hitchhikers-guide-to-smart-contracts-in-ethereum-848f08001f05#.cox40d2ut
 
-也许最基本的软件安全原则在于最大化可信代码的重用。在区块链技术中，这甚至会凝结成一句格言：“不要推出自己的密码”。就智能合约而言，这意味着尽可能多地从经过社区彻底审查的免费图书馆中获利。
+也许最基本的软件安全原则在于可信代码的最大化重用。在区块链技术中，这甚至会凝结成一句格言：“不要推出自己的加密”。就智能合约而言，这意味着尽可能多地使用经过社区彻底审查的免费库。
 
-在以太坊中，使用最广泛的解决方案是https://openzeppelin.org/[OpenZeppelin]套件，这是一个从ERC20和ERC721标记的实现到众多众包模型到简单行为常见于“Ownable”，“Pausable”或“LimitBalance”等合约中。该存储库中的合约已经过广泛的测试，并且在某些情况下甚至可以用作_de facto_标准实现。它们可以免费使用，并且由https://zeppelin.solutions [Zeppelin]和不断增长的外部贡献者列表构建和修复。
+在以太坊中，使用最广泛的解决方案是https://openzeppelin.org/[OpenZeppelin] 套件，这是一个合约库，涵盖从`ERC20`和`ERC721`token的实现，到各种风格的初始发币模型，到简单行为常见于“Ownable”，“Pausable”或“LimitBalance”等合约中。该存储库中的合约已经过广泛的测试，并且在某些情况下甚至可以用作_事实上的_标准实现。它们可以免费使用，由https://zeppelin.solutions[Zeppelin] 构建和维护，和不断增长的外部贡献者列表。
 
-同样来自Zeppelin的是https://zeppelinos.org/[zeppelin_os]，一个用于安全地开发和管理智能合约应用程序的服务和工具的开源平台。zeppelin_os在EVM之上提供了一个层，使开发人员可以轻松启动与可自行升级的经过良好测试的合约链上库链接的可升级DApp。这些库的不同版本可以共存于区块链中，并且凭证系统允许用户在不同方向上提出或推动改进。该平台还提供了一套用于调试，测试，部署和监控以太坊式应用程序的脱链工具。
+同样来自Zeppelin的是https://zeppelinos.org/[zeppelin_os] ，一个用于安全地开发和管理智能合约应用程序的服务和工具的开源平台。zeppelin_os在EVM之上提供了一个层，使开发人员可以轻松地将DApp链接到经过良好测试的链上合约库，使DApp可以自我升级。这些库的不同版本可以共存于区块链中，并且担保系统允许用户在不同方向上提出或推动改进。该平台还提供了一套用于调试、测试、部署和监控去中心应用程序的脱链工具。
 
 
 [[eth_contract_abi_sec]]
 === 以太坊合约应用程序二进制接口（ABI）
 
-在计算机软件中，应用程序二进制接口（ABI）是两个程序模块之间的接口; 通常，一个在机器代码级别，另一个在用户运行的程序级别。ABI定义了如何在*机器码*中访问数据结构和计算例程; 这不会与API相混淆，它以高级的，通常是人类可读的格式将此访问定义为*源代码*。因此，ABI是编码和解码数据进出机器码的主要方式。
+在计算机软件中，应用程序二进制接口（ABI）是两个程序模块之间的接口; 通常，一个在机器代码级别，另一个在用户运行的程序级别。ABI定义了如何在 *机器代码* 中访问数据结构和计算例程; 这不会与API相混淆，API以高级的、通常是人类可读的格式，如*源代码*。因此，ABI是编码和解码数据进出机器码的主要方式。
 
-在以太坊，ABI用于编码EVM的合约呼叫，并从交易中读取数据。正如前面部分所讨论的，以太坊智能合约是在*合约地址*下部署在区块链中的字节码。ABI的目的是为了指定合约中的哪些函数被调用并获得函数将以预期格式返回数据的保证。
+在以太坊，ABI用于编码EVM的合约调用，并从交易中读取数据。正如前面部分所讨论的，以太坊智能合约是在 *合约地址* 下部署在区块链中的字节码。ABI的目的是为了指定合约中的哪些函数被调用并获得函数将以预期格式返回数据的保证。
 
 ____
-如果账户或Web应用程序想要与已发布的合约进行交互并使用其功能之一，则账户首先需要通过ABI对函数的定义进行散列，以创建* EVM字节码*。然后，为了调用这个函数，这个账户会把这个字节码传递给一个交易的数据字段，这样字节码就可以用合约地址处的代码来解释。因此，外部函数调用的两个必要信息片段将是* ABI *和合约的地址，其中函数被写入*。我们在下面的详细例子中演示ABI的使用。
+如果账户或Web应用程序想要与已发布的合约进行交互并使用它的某个函数，则账户首先需要通过ABI对函数的定义进行散列，以创建 *EVM字节码* 。然后，为了调用这个函数，这个账户会把这个字节码传递给一个交易的数据字段，这样字节码就可以被合约地址处的代码（译者：指智能合约）来解释执行了。因此，外部函数调用的两个必要信息片段是 *ABI* 和 *合约地址（包含了被调用的函数）*。我们在下面的详细例子中演示ABI的使用。
 ____
 
-合约的ABI的JSON格式由一组函数和事件描述给出。函数描述是一个JSON对象，它包含`type`，`name`，`inputs`，`outputs`，`constant`和`payable`字段。事件描述对象具有`type`，`name`，`inputs`和`anonymous`的字段。
+合约ABI的JSON格式由一组函数和事件描述给出。函数描述是一个JSON对象，它包含`type`、`name`、`inputs`、`outputs`、`constant`和`payable`字段。事件描述对象具有`type`、`name`、`inputs`和`anonymous`的字段。
 
-因此，ABI指定了关于智能合约中的功能的信息，中继诸如输入和类型的信息。但是，ABI * only *包含有关函数和事件的信息，这意味着它不会包含状态变量或修饰符等字段的值。
+因此，ABI指定了关于智能合约中的函数的信息、如输入和类型的中继信息。但是，ABI *仅* 包含有关函数和事件的信息，这意味着它不会包含字段的值，如状态变量或修饰符。
 
 ----
 solcjs --abi foo.sol
 ----
 
 [[structure_of_call_data_sec]]
-==== 通话数据的结构
+==== 调用数据的结构
 
 函数调用的数据是几个字节值的串联。我们在下面的步骤中讨论这些。
 
-*前四字节*：通话数据始终以功能签名的* 4个字节*开头。具体来说，这些是函数的*签名*的Keccak-256散列的前四个字节。在这种情况下，签名只是一个带有括号的参数类型列表的函数名称，由单个逗号分隔。
+*前四个字节*: 调用数据始终以函数签名的 *4个字节* 开头。具体来说，这些是函数的 *签名* 的Keccak-256散列的前四个字节。在这种情况下，签名只是函数名称和一个带有括号的、逗号隔开的参数类型。
 
 假设，作为一个运行的例子，简短的合约`Test`：
 
-[源，坚固]
-合约测试{
-  函数foo（uint32 u，bool b）返回（bool b）{u> 2000 && b; }
+[source,solidity]
+contract Test {
+  function foo(uint32 u, bool b) returns (bool b) { u > 2000 && b; }
 }
 
-。要编码函数`foo（uint32 u，bool b）`：
-*'foo（uint32 u，bool b）'的签名是'foo（uint32，bool）`
-*通过Keccak-256运行`foo（uint32，bool）`输出哈希`cc822237a37f9290b70dab4d640156d816bf8abdb959b5971d803a639dadef98`
-*哈希的前四个字节是“cc822237”，它使我们得到一个方法ID“0xcc822237”
-*在Go 以太坊（geth）JavaScript控制台中执行命令web3.sha3（“foo（uint32，bool）”）。substring（0，10）`产生结果`“0xcc822237”`
+.要编码函数`foo(uint32 u,bool b)`:
+* `foo(uint32 u, bool b)`的签名是`foo(uint32,bool)`
+* 通过`foo(uint32,bool)`运行Keccak-256的输出哈希是`cc822237a37f9290b70dab4d640156d816bf8abdb959b5971d803a639dadef98`
+* 哈希的前四个字节是`cc822237`，它使我们得到一个方法ID`0xcc822237`
+* 在Go 以太坊（geth）的JavaScript控制台中执行命令`web3.sha3("foo(uint32,bool)").substring(0, 10)`产生结果`“0xcc822237”`
 
-*第5字节和开*：我们通过编码函数的*参数来继续我们的数据。对uint32进行编码意味着将数字转换为十六进制格式并用0填充，直到长度变为32字节为止，而编码“bool”相当于编码“uint”，其值为“true”和“0” `为`错误`。完整的类型编码列表可以在_Further Reading_部分的链接中找到。
+* 第5字节和后续*: 我们通过编码函数的 *参数* 来继续我们的数据。编码一个`uint32`意味着将数字转换为十六进制格式并用0填充，直到长度变为32字节为止，而编码一个`bool`相当于编码一个`uint`，其`1`值代表`true`和`0`代表`false`。完整的类型编码列表可以在 _进一步阅读_ 部分的链接中找到。
 
-。继续我们上面的例子，我们用参数`2345`和`true`调用函数`foo`：
-*`2345`的十六进制表示为`0x929`，所以填充为32字节，第一个参数`u`被编码为`0x0000000000000000000000000000000000000000000000000000000000000929`
-*“true”的十六进制表示为“1”，填充为32字节，第二个参数“b”变为“0x0000000000000000000000000000000000000000000000000000000000000001”
+.继续我们上面的例子，我们用参数`2345`和`true`调用函数`foo`：
+* `2345`的十六进制表示为`0x929`，所以填充为32字节，第一个参数`u`被编码为`0x0000000000000000000000000000000000000000000000000000000000000929`
+* `true`的十六进制表示为`1`，填充为32字节，第二个参数`b`变为`0x0000000000000000000000000000000000000000000000000000000000000001`
 
-*结果*：我们将方法ID与我们的编码参数连接起来，以便为我们的函数调用完成调用数据。在我们的例子中，参数为`2345`和`true`的函数`foo（uint32 u，bool b）`的调用数据是
+*结果*: 我们将方法ID与我们的编码参数连接起来，以便为我们的函数调用完成调用数据。在我们的例子中，参数为`2345`和`true`的函数`foo(uint32 u, bool b)`的调用数据是
 `0xcc82223700000000000000000000000000000000000000000000000000000000000009290000000000000000000000000000000000000000000000000000000000000001`
 
 ____
@@ -1248,20 +1240,20 @@ ____
 ____
 
 ////
-TO-DO：讨论事件与功能
+TO-DO：讨论事件vs函数
 ////
 
 [[further_reading_sec]]
-====进一步阅读
+==== 进一步阅读
 
-应用程序二进制接口（ABI）是强类型的，在编译时和静态时都是已知的。所有合约都有他们打算在编译时调用的任何合约的接口定义。
+应用程序二进制接口（ABI）是强类型的，是编译时已知的和静态的。所有合约都在编译时确定它们要调用的合约的接口定义。
 
-在以太坊 ABI上可以找到更严格和更深入的解释
-`的https：// solidity.readthedocs.io/EN /开发/ ABI-spec.html`。
+关于以太坊ABI的更严格和更深入的解释可以在以下的链接中找到`https://solidity.readthedocs.io/en/develop/abi-spec.html`。
+
 该链接包括有关编码的正式说明和各种有用示例的详细信息。
 
 [[deploying_smart_contracts_sec]]
-===部署智能合约
+=== 部署智能合约
 
 ////
 TODO：添加段落
@@ -1280,82 +1272,82 @@ TODO：添加段落
 
 有几个常用的测试框架（没有特定的顺序）
 
-松露测试::松露框架的一部分，松露允许用Javascript（基于Mocha）或Solidity编写单元测试。这些测试是针对TestRPC/Ganache运行的。编写这些测试的更多细节位于<<松露>>
+Truffle Test:: 是Truffle框架的一部分，Truffle允许用Javascript（基于Mocha）或Solidity编写单元测试。这些测试是针对TestRPC/Ganache运行的。编写这些测试的更多细节位于 <<truffle>>
 
 ////
-TODO：为“松露”添加锚点
+TODO：为 <<truffle>> 添加锚点
 ////
 
-Embark框架测试:: Embark与Mocha集成以运行用JavaScript编写的单元测试。测试依次运行在TestRPC/Ganache上部署的合约。Embark框架自动部署智能合约，并在合约更改时自动重新部署合约。它还跟踪部署的合约，并在真正需要时部署合约。Embark包含一个测试库，可以在EVM中快速运行和测试你的合约，并具有类似```assert.equal（）```的功能。```````````````````````````````````````````````````````“`````````
+Embark Framework Testing:: Embark与Mocha集成以运行用JavaScript编写的单元测试。这些测试依次执行部署在TestRPC/Ganache上的合约。Embark框架自动部署智能合约，并在合约更改时自动重新部署合约。它还跟踪部署的合约，并在真正需要时部署合约。Embark包含一个测试库，可以在EVM中快速运行和测试你的合约，并具有类似```assert.equal()```的函数。```embark test```会运行`test/`目录下任何测试文件。
 
-DApp::  DApp使用本地Solidity代码（一个名为ds-test的库）和一个Parity构建的Rust库（称为Ethrun）执行以太坊字节码，然后声明正确性。ds-test库提供用于验证控制台中数据记录的正确性和事件的断言功能。
+DApp:: DApp使用本地Solidity代码（一个名为ds-test的库）和一个Parity构建的Rust库（称为Ethrun）执行以太坊字节码，然后声明正确性。ds-test库提供用于验证正确性断言函数和用于在控制台中记录数据日志的事件。
 
 断言函数包括
 ....
-断言（布尔条件）
-assertEq（地址a，地址b）
-assertEq（bytes32 a，bytes32 b）
-assertEq（int a，int b）
-assertEq（uint a，uint b）
-assertEq0（字节a，字节b）
-expectEventsExact（地址目标）
+assert(bool condition)
+assertEq(address a, address b)
+assertEq(bytes32 a, bytes32 b)
+assertEq(int a, int b)
+assertEq(uint a, uint b)
+assertEq0(bytes a, bytes b)
+expectEventsExact(address target)
 ....
 
-记录事件会将信息记录到控制台，使其对调试有用。
+日志事件会将信息记录到控制台，使其对调试有用。
 ....
-日志（字节）
-log_bytes32（bytes32）
-log_named_bytes32（bytes32 key，bytes32 val）
-log_named_address（bytes32键，地址val）
-log_named_int（bytes32 key，int val）
-log_named_uint（bytes32 key，uint val）
-log_named_decimal_int（bytes32键，int val，uint小数）
-log_named_decimal_uint（bytes32键，uint val，uint小数）
+logs(bytes)
+log_bytes32(bytes32)
+log_named_bytes32(bytes32 key, bytes32 val)
+log_named_address(bytes32 key, address val)
+log_named_int(bytes32 key, int val)
+log_named_uint(bytes32 key, uint val)
+log_named_decimal_int(bytes32 key, int val, uint decimals)
+log_named_decimal_uint(bytes32 key, uint val, uint decimals)
 ....
 
-Populus::  Populus使用python和它自己的链模拟器来运行用可靠编写的合约。单元测试是用pytest库编写的。Populus支持专门用于测试的书面合约。这些合约文件名应该与glob模式```Test * .sol``匹配，并且可以位于项目测试目录```。/ tests /```下的任何位置。
+Populus:: Populus使用python和它自己的链模拟器来运行用solidity编写的合约。单元测试是用pytest库编写的。Populus支持编写专门用于测试的合约。这些合约文件名应该与glob模式```Test*.sol```匹配，并且可以位于项目测试目录```./tests/```下的任意位置。
 
-| =======
+|=======
 |框架| 测试语言| 测试框架| 链仿真器| 网站
-|松露| Javascript/Solidity | 摩卡| TestRPC/Ganache | truffleframework.com
-|登船| Javascript | 摩卡| TestRPC/Ganache | embark.readthedocs.io
-| DApp | 坚实| ds-test（自定义）| Ethrun（奇偶校验）| dapp.readthedocs.io
-|杨树| Python | Pytes | Python链模拟器| populus.readthedocs.io
-| =======
+|Truffle   | Javascript/Solidity | Mocha             | TestRPC/Ganache      | truffleframework.com
+|Embark    | Javascript          | Mocha             | TestRPC/Ganache      | embark.readthedocs.io
+|DApp      | Solidity            | ds-test (custom)  | Ethrun (Parity)      | dapp.readthedocs.io
+|Populus   | Python              | Pytes             | Python chain emulator| populus.readthedocs.io
+|=======
 
 =======
 如果这是你第一次使用geth，则可能需要一段时间才能同步到网络。
-然后设置你的变量：
+然后按下面设置你的变量：
 ----
-> var foo = eth（<CONTENTS_OF_ABI_FILE>）
-> var byteCode ='0x <CONTENTS_OF_BIN_FILE>）
+> var foo = eth(<CONTENTS_OF_ABI_FILE>)
+> var byteCode = '0x<CONTENTS_OF_BIN_FILE>)
 ----
 使用上面更多命令的输出填充参数。
 然后最终部署你的合约：
 ----
-> var deploy = {from eth.coinbase，data：byteCode，gas：2000000}
-> var fooInstance = foo（bar，baz）
+> var deploy = {from eth.coinbase, data:byteCode, gas:2000000}
+> var fooInstance = foo(bar, baz)
 ----
 =======
 
 [[on_blockchain_testing_sec]]
-==== 在区块链测试
+==== 区块链链上测试
 
-尽管大多数测试不应发生在部署的合约上，但可以通过以太坊客户端检查合约的行为。以下命令可用于评估智能合约的状态。这些命令应该在' +geth+ '终端输入，尽管任何web3调用也会支持这些命令。
+尽管大多数测试不应发生在部署的合约上，但可以通过以太坊客户端检查合约的行为。以下命令可用于评估智能合约的状态。这些命令应该在 '+geth+' 终端输入，尽管任何web3调用也会支持这些命令。
 
 ....
-eth.getTransactionReceipt（txhash）;
+eth.getTransactionReceipt(txhash);
 ....
-可用于在` +txhash+ `处获得合约地址。
+可用于在`+txhash+`处获得合约地址。
 ....
-eth.getCode（contractaddress）
+eth.getCode(contractaddress)
 ....
-获取部署在` +contractaddress+ `的合约代码。这可以用来验证正确的部署。
+获取部署在`+contractaddress+`的合约代码。这可以用来验证正确的部署。
 ....
-eth.getPastLogs（选项）
+eth.getPastLogs(options)
 ....
-获取位于地址的合约的完整日志，在选项中指定。这有助于查看合约呼叫的历史记录。
+获取位于地址的合约的完整日志，在选项中指定。这有助于查看合约调用的历史记录。
 ....
-eth.getStorageAt（地址，位置）
+eth.getStorageAt(address, position)
 ....
-获取位于+地址+处的存储，其中偏移量为+位置+显示存储在该合约中的数据。
+获取位于`+address+`和偏移量为`+position+`的存储，显示存储在该合约中的数据。
