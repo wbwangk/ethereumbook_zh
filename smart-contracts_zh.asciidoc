@@ -1182,7 +1182,7 @@ https://medium.com/zeppelin-blog/the-hitchhikers-guide-to-smart-contracts-in-eth
 
 也许最基本的软件安全原则在于可信代码的最大化重用。在区块链技术中，这甚至会凝结成一句格言：“不要推出自己的加密”。就智能合约而言，这意味着尽可能多地使用经过社区彻底审查的免费库。
 
-在以太坊中，使用最广泛的解决方案是https://openzeppelin.org/[OpenZeppelin] 套件，这是一个合约库，涵盖从`ERC20`和`ERC721`token的实现，到各种风格的初始发币模型，到简单行为常见于“Ownable”，“Pausable”或“LimitBalance”等合约中。该存储库中的合约已经过广泛的测试，并且在某些情况下甚至可以用作_事实上的_标准实现。它们可以免费使用，由https://zeppelin.solutions[Zeppelin] 构建和维护，和不断增长的外部贡献者列表。
+在以太坊中，使用最广泛的解决方案是https://openzeppelin.org/[OpenZeppelin] 套件，这是一个合约库，涵盖从 `ERC20` 和 `ERC721` token的实现，到各种风格的初始发币模型，到简单行为常见于“Ownable”，“Pausable”或“LimitBalance”等合约中。该存储库中的合约已经过广泛的测试，并且在某些情况下甚至可以用作_事实上的_标准实现。它们可以免费使用，由https://zeppelin.solutions[Zeppelin] 构建和维护，和不断增长的外部贡献者列表。
 
 同样来自Zeppelin的是https://zeppelinos.org/[zeppelin_os] ，一个用于安全地开发和管理智能合约应用程序的服务和工具的开源平台。zeppelin_os在EVM之上提供了一个层，使开发人员可以轻松地将DApp链接到经过良好测试的链上合约库，使DApp可以自我升级。这些库的不同版本可以共存于区块链中，并且担保系统允许用户在不同方向上提出或推动改进。该平台还提供了一套用于调试、测试、部署和监控去中心应用程序的脱链工具。
 
