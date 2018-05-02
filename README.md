@@ -32,7 +32,7 @@
 | [清白](wallets.asciidoc) | ########### | :heavy_check_mark: ||
 | [交易](transactions.asciidoc) | ############### | :heavy_check_mark: ||
 | [智能合约](smart-contracts.asciidoc) | #################### |||
-| 开发工具和框架](dev-tools.asciidoc) | ###### |||
+| [开发工具和框架](dev-tools.asciidoc) | ###### |||
 | [Tokens](tokens.asciidoc) | ################### | :heavy_check_mark: ||
 | [DApps](dapps.asciidoc) | ### |||
 | [Oracles](oracles.asciidoc) | ####### |||
