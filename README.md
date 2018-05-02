@@ -22,25 +22,25 @@
 
 | 章节 | 进展 | 内容完成 | 检查完成 |
 |-------|------|:------:|:------:|
-| [前言](preface.asciidoc) | #### |||
-| [词汇表](glossary.asciidoc) | ######## |||
-| [什么是以太坊](what-is.asciidoc) | ######### | :heavy_check_mark: ||
-| [介绍](intro.asciidoc) | ############# | :heavy_check_mark: ||
-| [以太坊客户端](clients.asciidoc) | ########## |||
-| [以太坊测试](ethereum-testnets.asciidoc) | #### |||
-| [密钥和地址](keys-addresses.asciidoc) | ############# | :heavy_check_mark: ||
-| [清白](wallets.asciidoc) | ########### | :heavy_check_mark: ||
-| [交易](transactions.asciidoc) | ############### | :heavy_check_mark: ||
-| [智能合约](smart-contracts.asciidoc) | #################### |||
-| [开发工具和框架](dev-tools.asciidoc) | ###### |||
-| [Tokens](tokens.asciidoc) | ################### | :heavy_check_mark: ||
-| [DApps](dapps.asciidoc) | ### |||
-| [Oracles](oracles.asciidoc) | ####### |||
-| [账号和燃料](gas.asciidoc) | #### |||
-| [EVM](evm.asciidoc) | ####### |||
-| [共识](consensus.asciidoc) | ##### |||
+| [前言](preface_zh.asciidoc) | #### |||
+| [词汇表](glossary_zh.asciidoc) | ######## |||
+| [什么是以太坊](what-is_zh.asciidoc) | ######### | :heavy_check_mark: ||
+| [介绍](intro_zh.asciidoc) | ############# | :heavy_check_mark: ||
+| [以太坊客户端](clients_zh.asciidoc) | ########## |||
+| [以太坊测试](ethereum-testnets_zh.asciidoc) | #### |||
+| [密钥和地址](keys-addresses_zh.asciidoc) | ############# | :heavy_check_mark: ||
+| [钱包](wallets_zh.asciidoc) | ########### | :heavy_check_mark: ||
+| [交易](transactions_zh.asciidoc) | ############### | :heavy_check_mark: ||
+| [智能合约](smart-contracts_zh.asciidoc) | #################### |||
+| [开发工具和框架](dev-tools_zh.asciidoc) | ###### |||
+| [Tokens](tokens_zh.asciidoc) | ################### | :heavy_check_mark: ||
+| [DApps](dapps_zh.asciidoc) | ### |||
+| [Oracles](oracles_zh.asciidoc) | ####### |||
+| [账号和燃料](gas_zh.asciidoc) | #### |||
+| [EVM](evm_zh.asciidoc) | ####### |||
+| [共识](consensus_zh.asciidoc) | ##### |||
 | [Vyper](vyper.asciidoc) | ##### |||
-| [DevP2P协议](devp2p-protocol.asciidoc) | ### |||
+| [DevP2P协议](devp2p-protocol_zh.asciidoc) | ### |||
 | [以太坊标准(EIPs/ERCs)](standards-eip-erc.asciidoc) | #### |||
 
 
